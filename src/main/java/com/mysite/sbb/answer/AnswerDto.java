@@ -15,6 +15,8 @@ public class AnswerDto {
     private QuestionDto question;
 
 
+    /*
+
     // 엔티티를 DTO로 변환
     public static AnswerDto fromEntity(Answer answer) {
         return AnswerDto.builder()
@@ -34,4 +36,6 @@ public class AnswerDto {
                 .question(this.question.toEntity()) // QuestionDto를 다시 엔티티로 변환
                 .build();
     }
+
+    */
 }

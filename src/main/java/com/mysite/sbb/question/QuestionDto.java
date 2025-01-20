@@ -1,6 +1,7 @@
 package com.mysite.sbb.question;
 
 import com.mysite.sbb.answer.Answer;
+import com.mysite.sbb.answer.AnswerDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,6 +16,16 @@ public class QuestionDto {
     private String content;
     private LocalDateTime createDate;
     private List<Answer> answerList;
+
+    /*\
+    static : 내부 클래스를 정의하기 위해서
+
+    static으로 선언된 이유는
+    Builder 클래스가 UserDTO의 인스턴스 없이도 독립적으로 동작하도록 하기 위함입니다.
+    즉, static이 아니었다면 Builder 클래스에서 UserDTO의 인스턴스에 접근하려면
+    외부에서 UserDTO 객체를 먼저 생성해야 합니다.
+
+
 
     // 엔티티를 DTO로 변환
     public static QuestionDto fromEntity(Question question) {
@@ -37,4 +48,6 @@ public class QuestionDto {
                 .answerList(this.answerList)
                 .build();
     }
+
+    */
 }

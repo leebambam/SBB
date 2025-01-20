@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class AnswerService {
 
     private final AnswerRepository answerRepository;
+    private final AnswerMapper answerMapper;
 
 
     /*public void create(Question question, String content) {
@@ -20,7 +21,7 @@ public class AnswerService {
         answer.setCreateDate(LocalDateTime.now());
         answer.setQuestion(question);
         this.answerRepository.save(answer);
-    }*/
+    }
     public void create(QuestionDto questionDto, String content) {
         Question question = Question.builder()
                 .id(questionDto.getId())
@@ -34,6 +35,23 @@ public class AnswerService {
                 .createDate(LocalDateTime.now())
                 .question(question)
                 .build();
+
+        this.answerRepository.save(answer);
+    }
+
+    */
+    public void create(QuestionDto questionDto, String content) {
+        //AnswerMapper mapper = AnswerMapper.INSTANCE;
+
+        // QuestionDto를 Question 엔티티로 변환
+        AnswerDto answerDto = AnswerDto.builder()
+                .content(content)
+                .createDate(LocalDateTime.now())
+                .question(questionDto)
+                .build();
+
+        // DTO를 엔티티로 변환
+        Answer answer = answerMapper.toEntity(answerDto);
 
         this.answerRepository.save(answer);
     }

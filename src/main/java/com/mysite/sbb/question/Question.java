@@ -18,7 +18,8 @@ import lombok.*;
 @Getter
 //@Setter
 @Builder
-@NoArgsConstructor // 기본 생성자 (파라미터가 없는 생성자)를 생성, 객체 초기화를 위해 기본 생성자를 명시적으로 작성하지 않아도 자동으로 생성됩니다.
+@NoArgsConstructor // 기본 생성자 (매개변수가 없는 생성자)를 생성, 객체 초기화를 위해 기본 생성자를 명시적으로 작성하지 않아도 자동으로 생성됩니다.
+// JPA(Entity)에서는 매개변수가 없는 기본 생성자가 필요
 @AllArgsConstructor // 모든 필드를 매개변수로 받는 생성자를 생성합니다.
 @Entity // 엔티티란? 데이터베이스 테이블과 매핑되는 자바 클래스
 public class Question {

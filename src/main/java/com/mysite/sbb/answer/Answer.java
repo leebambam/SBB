@@ -18,11 +18,11 @@ import lombok.*;
 @NoArgsConstructor
 // 기본 생성자(매개변수가 없는 생성자)를 자동으로 생성, 기본 생성자의 접근 수준을 protected로 설정
 // @NoArgsConstructor(access = AccessLevel.PROTECTED) : 즉, 이 클래스는 외부에서 인스턴스를 직접 생성할 수 없고, 상속 받은 클래스에서만 기본 생성자를 호출할 수 있습니다.
-@AllArgsConstructor
+@AllArgsConstructor // 모든 필드를 매개변수로 받는 생성자를 생성합니다.
 @Entity
 @Builder
 /*
-* 자동 생성
+*  빌더 클래스를 자동 생성
 * Answer answer = Answer.builder()
     .content(content)
     .createDate(LocalDateTime.now())
