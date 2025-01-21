@@ -2,6 +2,7 @@ package com.mysite.sbb.question;
 
 import com.mysite.sbb.answer.AnswerForm;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,11 +18,29 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
+
+    /*
     @RequestMapping("/list")
     public String list(Model model) {
         // List<Question> questionList = this.questionService.getList();
         List<QuestionDto> questionList = this.questionService.getList();
         model.addAttribute("questionList", questionList);
+        return "question_list";
+    }
+
+    http://localhost:8080/question/list?page=0와 같이
+    GET 방식으로 요청된 URL에서 page값을 가져오기 위해
+
+    list 메서드의 매개변수로 @RequestParam(value="page", defaultValue="0") int page가 추가되었다.
+
+    GET 방식에서는 값을 전달하기 위해서 ?와 & 기호를 사용한다.
+    첫 번째 파라미터는 ? 기호를 사용하고 그 이후 추가되는 값은 & 기호를 사용한다.
+
+    */
+    @GetMapping("/list")
+    public String list(Model model, @RequestParam(value="page", defaultValue = "0") int page) {
+        Page<QuestionDto> paging = this.questionService.getList(page);
+        model.addAttribute("paging", paging);
         return "question_list";
     }
 
@@ -56,5 +75,6 @@ public class QuestionController {
         this.questionService.create(questionForm.getSubject(), questionForm.getContent());
         return "redirect:/question/list";
     }
+
 
 }

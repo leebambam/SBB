@@ -4,6 +4,7 @@ import com.mysite.sbb.answer.Answer;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -37,4 +38,28 @@ public interface QuestionMapper {
 
     // 엔티티 리스트 → DTO 리스트 변환
     List<QuestionDto> toDtoList(List<Question> questions);
+
+
+    /*
+    questions : Page<Question> 객체로, 스프링 데이터 JPA에서 지원하는 페이징 클래스
+
+    map : Page<T>의 map 메서드, 새로운 Page<R>를 반환
+
+    this::toDto
+        :  QuestionMapper 인터페이스의 toDto(Question question) 메서드를 참조
+            (= 현재 QuestionMapper 객체에서 정의된 toDto 메서드를 사용하겠다는 뜻)
+
+            this = 현재 QuestionMapper 객체
+            toDto = 단일 Question 객체를 QuestionDto 객체로 변환
+            페이지의 모든 Question 객체에 toDto를 적용하여 QuestionDto로 변환
+
+    questions.map(this::toDto)가 호출되면
+        map 메서드가 questions의 각 요소(Question)에 대해 toDto 메서드를 호출
+        결과적으로, 모든 Question 객체가 QuestionDto 객체로 변환
+    */
+
+    // 엔티티 페이지 → DTO 페이지 변환
+    default Page<QuestionDto> toDto(Page<Question> questions) {
+        return questions.map(this::toDto); // map 메서드로 각 엔티티를 변환
+    }
 }
