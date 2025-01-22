@@ -72,7 +72,15 @@ public class QuestionController {
         if (bindingResult.hasErrors()) {
             return "question_form";
         }
-        this.questionService.create(questionForm.getSubject(), questionForm.getContent());
+
+        // QuestionForm을 QuestionDto로 변환
+        QuestionDto questionDto = QuestionDto.builder()
+                .subject(questionForm.getSubject())
+                .content(questionForm.getContent())
+                .build();
+
+        //this.questionService.create(questionForm.getSubject(), questionForm.getContent());
+        this.questionService.create(questionDto);
         return "redirect:/question/list";
     }
 

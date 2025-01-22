@@ -1,7 +1,6 @@
 package com.mysite.sbb.question;
 
 import com.mysite.sbb.answer.Answer;
-import com.mysite.sbb.answer.AnswerDto;
 import lombok.Builder;
 import lombok.Getter;
 

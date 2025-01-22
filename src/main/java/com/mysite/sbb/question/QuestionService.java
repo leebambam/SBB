@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -78,16 +77,25 @@ public class QuestionService {
         q.setContent(content);
         q.setCreateDate(LocalDateTime.now());
         this.questionRepository.save(q);
-    }*/
 
-    public void create(String subject, String content) {
+        public void create(String subject, String content) {
         Question question = Question.builder()
                 .subject(subject)
                 .content(content)
                 .createDate(LocalDateTime.now())
                 .build();
         this.questionRepository.save(question);
+        }
+    }*/
+    public void create(QuestionDto questionDto) {
+        Question question = Question.builder()
+                .subject(questionDto.getSubject())
+                .content(questionDto.getContent())
+                .createDate(LocalDateTime.now())
+                .build();
+        this.questionRepository.save(question);
     }
+
 
     public Page<QuestionDto> getList(int page) {
         List<Sort.Order> sorts = new ArrayList<>();
