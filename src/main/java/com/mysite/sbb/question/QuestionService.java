@@ -1,6 +1,9 @@
 package com.mysite.sbb.question;
 
 import com.mysite.sbb.DataNotFoundException;
+import com.mysite.sbb.user.SiteUser;
+import com.mysite.sbb.user.UserDto;
+import com.mysite.sbb.user.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +22,7 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
     private final QuestionMapper questionMapper;
+    private final UserMapper userMapper;
 
     /*public List<Question> getList() {
         return this.questionRepository.findAll(); // Question 엔티티의 모든 데이터를 List<Question> 형태로 반환
@@ -87,11 +91,15 @@ public class QuestionService {
         this.questionRepository.save(question);
         }
     }*/
-    public void create(QuestionDto questionDto) {
+    public void create(QuestionDto questionDto, UserDto userDto) {
+
+        SiteUser author  = this.userMapper.toEntity(userDto);
+
         Question question = Question.builder()
                 .subject(questionDto.getSubject())
                 .content(questionDto.getContent())
                 .createDate(LocalDateTime.now())
+                .author(author)
                 .build();
         this.questionRepository.save(question);
     }

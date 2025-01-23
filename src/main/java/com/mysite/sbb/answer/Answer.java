@@ -11,6 +11,7 @@ import javax.persistence.ManyToOne;
 
 import com.mysite.sbb.question.Question;
 
+import com.mysite.sbb.user.SiteUser;
 import lombok.*;
 
 @Getter
@@ -42,6 +43,9 @@ public class Answer {
 
     @ManyToOne
     private Question question;
+
+    @ManyToOne
+    private SiteUser author;
 
     // 향후 사용 가능한지 체크~
     public Answer(String content, LocalDateTime createDate, Question question) {

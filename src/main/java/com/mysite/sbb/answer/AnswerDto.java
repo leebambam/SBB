@@ -1,6 +1,7 @@
 package com.mysite.sbb.answer;
 
 import com.mysite.sbb.question.QuestionDto;
+import com.mysite.sbb.user.UserDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,6 +14,7 @@ public class AnswerDto {
     private String content;
     private LocalDateTime createDate;
     private QuestionDto question;
+    private UserDto author;
 
 
     /*

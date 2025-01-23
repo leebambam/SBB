@@ -1,14 +1,19 @@
 package com.mysite.sbb.question;
 
 import com.mysite.sbb.answer.AnswerForm;
+import com.mysite.sbb.user.UserDto;
+import com.mysite.sbb.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 @RequestMapping("/question")
@@ -17,6 +22,7 @@ import java.util.List;
 public class QuestionController {
 
     private final QuestionService questionService;
+    private final UserService userService;
 
 
     /*
@@ -52,6 +58,7 @@ public class QuestionController {
         return "question_detail";
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")
     public String questionCreate(QuestionForm questionForm) {
         return "question_form";
@@ -66,9 +73,15 @@ public class QuestionController {
 
         @Valid 애너테이션을 적용하면 QuestionForm의 @NotEmpty, @Size 등으로 설정한 검증 기능이 동작한다.
         BindingResult 매개변수는 @Valid 애너테이션으로 검증이 수행된 결과를 의미하는 객체
+
+        @PreAuthorize("isAuthenticated()")
+        : 애너테이션이 붙은 메서드는 로그인한 경우에만 실행된다.
+        로그아웃 상태에서 호출되면 로그인 페이지로 강제 이동된다.
     */
+
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
-    public String questionCreate(@Valid QuestionForm questionForm, BindingResult bindingResult) {
+    public String questionCreate(@Valid QuestionForm questionForm, BindingResult bindingResult, Principal principal) {
         if (bindingResult.hasErrors()) {
             return "question_form";
         }
@@ -79,8 +92,10 @@ public class QuestionController {
                 .content(questionForm.getContent())
                 .build();
 
+        UserDto userDto = this.userService.getUser(principal.getName());
+
         //this.questionService.create(questionForm.getSubject(), questionForm.getContent());
-        this.questionService.create(questionDto);
+        this.questionService.create(questionDto, userDto);
         return "redirect:/question/list";
     }
 

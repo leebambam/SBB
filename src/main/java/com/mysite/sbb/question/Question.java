@@ -3,16 +3,11 @@ package com.mysite.sbb.question;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 import com.mysite.sbb.answer.Answer;
 
+import com.mysite.sbb.user.SiteUser;
 import lombok.*;
 
 @Getter
@@ -37,4 +32,8 @@ public class Question {
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL) // 질문 하나에 답변은 여러 개
     private List<Answer> answerList;
+
+    // 사용자 한 명이 질문을 여러 개 작성할 수 있다
+    @ManyToOne
+    private SiteUser author;
 }

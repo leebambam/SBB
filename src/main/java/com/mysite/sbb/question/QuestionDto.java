@@ -1,6 +1,8 @@
 package com.mysite.sbb.question;
 
 import com.mysite.sbb.answer.Answer;
+import com.mysite.sbb.user.SiteUser;
+import com.mysite.sbb.user.UserDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,6 +17,7 @@ public class QuestionDto {
     private String content;
     private LocalDateTime createDate;
     private List<Answer> answerList;
+    private UserDto author;
 
     /*\
     static : 내부 클래스를 정의하기 위해서
