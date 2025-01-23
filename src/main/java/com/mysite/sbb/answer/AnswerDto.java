@@ -15,6 +15,7 @@ public class AnswerDto {
     private LocalDateTime createDate;
     private QuestionDto question;
     private UserDto author;
+    private LocalDateTime modifyDate;
 
 
     /*

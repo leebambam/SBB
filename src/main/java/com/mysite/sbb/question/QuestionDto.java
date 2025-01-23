@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Builder
+@Builder(toBuilder = true) // toBuilder 활성화
 public class QuestionDto {
     private Integer id;
     private String subject;
@@ -18,6 +18,7 @@ public class QuestionDto {
     private LocalDateTime createDate;
     private List<Answer> answerList;
     private UserDto author;
+    private LocalDateTime modifyDate;
 
     /*\
     static : 내부 클래스를 정의하기 위해서

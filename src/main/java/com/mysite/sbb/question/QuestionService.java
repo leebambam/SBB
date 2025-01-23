@@ -114,4 +114,18 @@ public class QuestionService {
 
     }
 
+    // 질문 수정
+    public void modify(QuestionDto questionDto, String subject, String content) {
+        questionDto = questionDto.toBuilder()
+                .subject(subject)
+                .content(content)
+                .modifyDate(LocalDateTime.now())
+                .build();
+
+        Question question = questionMapper.toEntity(questionDto);
+
+        this.questionRepository.save(question);
+
+    }
+
 }

@@ -47,6 +47,8 @@ public class Answer {
     @ManyToOne
     private SiteUser author;
 
+    private LocalDateTime modifyDate;
+
     // 향후 사용 가능한지 체크~
     public Answer(String content, LocalDateTime createDate, Question question) {
         this.content = content;
