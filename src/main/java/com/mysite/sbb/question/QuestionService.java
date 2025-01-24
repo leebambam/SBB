@@ -128,4 +128,12 @@ public class QuestionService {
 
     }
 
+    // 질문 삭제
+    public void delete(QuestionDto questionDto) {
+
+        Question question = questionMapper.toEntity(questionDto);
+
+        this.questionRepository.delete(question);
+    }
+
 }

@@ -1,12 +1,15 @@
 package com.mysite.sbb.answer;
 
+import com.mysite.sbb.DataNotFoundException;
 import com.mysite.sbb.question.Question;
 import com.mysite.sbb.question.QuestionDto;
 import com.mysite.sbb.user.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -62,5 +65,45 @@ public class AnswerService {
         Answer answer = answerMapper.toEntity(answerDto);
 
         this.answerRepository.save(answer);
+    }
+
+
+    /*public Answer getAnswer(Integer id) {
+        Optional<Answer> answer = this.answerRepository.findById(id);
+        if (answer.isPresent()) {
+            return answer.get();
+        } else {
+            throw new DataNotFoundException("answer not found");
+        }
+    }*/
+    // 답변 조회
+    public AnswerDto getAnswer(Integer id) {
+        Optional<Answer> answer = this.answerRepository.findById(id);
+        if (answer.isPresent()) {
+            //return answer.get();
+            return answerMapper.toDto(answer.get());
+        } else {
+            throw new DataNotFoundException("answer not found");
+        }
+    }
+
+    // 답변 수정
+    public void modify(AnswerDto answerDto, String content) {
+        answerDto = answerDto.toBuilder()
+                .content(content)
+                .modifyDate(LocalDateTime.now())
+                .build();
+
+        Answer answer = answerMapper.toEntity(answerDto);
+
+        this.answerRepository.save(answer);
+    }
+
+    // 답변 삭제
+    public void delete(AnswerDto answerDto) {
+
+        Answer answer = answerMapper.toEntity(answerDto);
+
+        this.answerRepository.delete(answer);
     }
 }

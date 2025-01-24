@@ -5,6 +5,11 @@
         <div class="card-body">
             <div class="card-text" style="white-space: pre-line;" th:text="${question.content}"></div>
             <div class="d-flex justify-content-end">
+                <!--수정 일시-->
+                <div th:if="${question.modifyDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
+                    <div class="mb-2">modified at</div>
+                    <div th:text="${#temporals.format(question.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
+                </div>
                 <div class="badge bg-light text-dark p-2 text-start">
                     <div class="mb-2">
                         <span th:if="${question.author != null}" th:text="${question.author.username}"></span>
@@ -13,13 +18,25 @@
                 </div>
             </div>
             <!--
+                    #authentication.getPrincipal()은 타임리프에서 스프링 시큐리티와 함께 사용하는 표현식
                     [수정] 버튼이 로그인한 사용자와 글쓴이가 동일할 경우에만 노출되도록
+
+                    [삭제] 버튼은  href 속성값을 javascript:void(0)로 설정하고
+                    삭제를 실행할 URL을 얻기 위해 th:data-uri 속성을 추가한 뒤
+                    [삭제] 버튼을 클릭하는 이벤트를 확인하기 위해 class 속성에 delete 항목을 추가
+
+                    ** href에 삭제를 위한 URL을 직접 사용하지 않은 이유?
+                    [삭제] 버튼을 클릭했을 때 ‘정말로 삭제하시겠습니까?’와 같은 메시지와 함께 별도의 확인 절차를 중간에 끼워 넣기 위해서
             -->
             <div class="my-3">
                 <a th:href="@{|/question/modify/${question.id}|}" class="btn btn-sm btn-outline-secondary"
                     sec:authorize="isAuthenticated()"
                     th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
                     th:text="수정"></a>
+                <a href="javascript:void(0);" th:data-uri="@{|/question/delete/${question.id}|}" class="delete btn btn-sm btn-outline-secondary"
+                    sec:authorize="isAuthenticated()"
+                    th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
+                    th:text="삭제"></a>
             </div>
         </div>
     </div>
@@ -30,12 +47,30 @@
             <div class="card-body">
                 <div class="card-text" style="white-space: pre-line;" th:text="${answer.content}"></div>
                 <div class="d-flex justify-content-end">
+                    <!--수정 일시-->
+                    <div th:if="${answer.modifyDate != null}" class="badge bg-light text-dark p-2 text-start mx-3">
+                        <div class="mb-2">modified at</div>
+                        <div th:text="${#temporals.format(answer.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
+                    </div>
                     <div class="badge bg-light text-dark p-2 text-start">
                         <div class="mb-2">
                             <span th:if="${answer.author != null}" th:text="${answer.author.username}"></span>
                         </div>
                         <div th:text="${#temporals.format(answer.createDate, 'yyyy-MM-dd HH:mm')}"></div>
                     </div>
+                </div>
+                <!--
+                로그인한 사용자와 답변 작성자가 동일한 경우 답변의 [수정] 버튼이 노출
+                -->
+                <div class="my-3">
+                    <a th:href="@{|/answer/modify/${answer.id}|}" class="btn btn-sm btn-outline-secondary"
+                        sec:authorize="isAuthenticated()"
+                        th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
+                        th:text="수정"></a>
+                    <a href="javascript:void(0);" th:data-uri="@{|/answer/delete/${answer.id}|}" class="delete btn btn-sm btn-outline-secondary"
+                        sec:authorize="isAuthenticated()"
+                        th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
+                        th:text="삭제"></a>
                 </div>
             </div>
         </div>
@@ -47,4 +82,15 @@
         <input type="submit" value="답변등록" class="btn btn-primary my-2">
     </form>
 </div>
+<script layout:fragment="script" type='text/javascript'>
+    const delete_elements = document.getElementsByClassName("delete");
+
+    Array.from(delete_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            if(confirm("정말로 삭제하시겠습니까?")) {
+                location.href = this.dataset.uri;
+            };
+        });
+    });
+</script>
 </html>

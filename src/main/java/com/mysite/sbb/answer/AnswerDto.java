@@ -8,7 +8,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
+@Builder(toBuilder = true) // toBuilder 활성화
 public class AnswerDto {
     private Integer id;
     private String content;
