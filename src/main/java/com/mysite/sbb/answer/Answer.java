@@ -1,6 +1,7 @@
 package com.mysite.sbb.answer;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import javax.persistence.*;
 
@@ -43,6 +44,9 @@ public class Answer {
     private SiteUser author;
 
     private LocalDateTime modifyDate;
+
+    @ManyToMany
+    Set<SiteUser> voter;
 
     // 향후 사용 가능한지 체크~
     public Answer(String content, LocalDateTime createDate, Question question) {

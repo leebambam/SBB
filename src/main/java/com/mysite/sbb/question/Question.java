@@ -2,6 +2,7 @@ package com.mysite.sbb.question;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.*;
 
@@ -38,4 +39,13 @@ public class Question {
     private SiteUser author;
 
     private LocalDateTime modifyDate;
+
+    /*
+        [추천] 버튼을 클릭한 사용자
+
+        Set 자료형 : voter 속성값이 서로 중복되지 않도록 하기 위해서
+
+    */
+    @ManyToMany
+    Set<SiteUser> voter;
 }

@@ -1,13 +1,13 @@
 package com.mysite.sbb.answer;
 
 import com.mysite.sbb.DataNotFoundException;
-import com.mysite.sbb.question.Question;
 import com.mysite.sbb.question.QuestionDto;
+import com.mysite.sbb.user.SiteUser;
 import com.mysite.sbb.user.UserDto;
+import com.mysite.sbb.user.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -17,6 +17,7 @@ public class AnswerService {
 
     private final AnswerRepository answerRepository;
     private final AnswerMapper answerMapper;
+    private final UserMapper userMapper;
 
 
     /*public void create(Question question, String content) {
@@ -105,5 +106,15 @@ public class AnswerService {
         Answer answer = answerMapper.toEntity(answerDto);
 
         this.answerRepository.delete(answer);
+    }
+
+    // 담변 추천한 사람 저장
+    public void vote(AnswerDto answerDto, UserDto userDto){
+        Answer answer = answerMapper.toEntity(answerDto);
+        SiteUser siteUser = userMapper.toEntity(userDto);
+
+        answer.getVoter().add(siteUser);
+
+        this.answerRepository.save(answer);
     }
 }

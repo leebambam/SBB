@@ -98,4 +98,15 @@ public class AnswerController {
 
         return String.format("redirect:/question/detail/%s", answerDto.getQuestion().getId());
     }
+
+    // 사용자(siteUser)를 추천인(voter)으로 저장
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/vote/{id}")
+    public String answerVote(Principal principal, @PathVariable("id") Integer id) {
+        AnswerDto answerDto = this.answerService.getAnswer(id);
+        UserDto userDto = this.userService.getUser(principal.getName());
+
+        this.answerService.vote(answerDto, userDto);
+        return String.format("redirect:/question/detail/%s", answerDto.getQuestion().getId());
+    }
 }

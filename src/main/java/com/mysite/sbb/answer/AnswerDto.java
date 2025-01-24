@@ -1,11 +1,14 @@
 package com.mysite.sbb.answer;
 
 import com.mysite.sbb.question.QuestionDto;
+import com.mysite.sbb.user.SiteUser;
 import com.mysite.sbb.user.UserDto;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.persistence.ManyToMany;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Builder(toBuilder = true) // toBuilder 활성화
@@ -16,6 +19,7 @@ public class AnswerDto {
     private QuestionDto question;
     private UserDto author;
     private LocalDateTime modifyDate;
+    private Set<UserDto> voter;
 
 
     /*

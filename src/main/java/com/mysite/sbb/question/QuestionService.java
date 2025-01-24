@@ -136,4 +136,15 @@ public class QuestionService {
         this.questionRepository.delete(question);
     }
 
+    //  로그인한 사용자를 질문 엔티티에 추천인으로 저장
+    public void vote(QuestionDto questionDto, UserDto userDto) {
+
+        Question question = questionMapper.toEntity(questionDto);
+        SiteUser siteUser = userMapper.toEntity(userDto);
+
+        question.getVoter().add(siteUser);
+
+        this.questionRepository.save(question);
+    }
+
 }

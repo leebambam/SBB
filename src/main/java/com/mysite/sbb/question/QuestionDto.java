@@ -8,6 +8,7 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Builder(toBuilder = true) // toBuilder 활성화
@@ -19,6 +20,7 @@ public class QuestionDto {
     private List<Answer> answerList;
     private UserDto author;
     private LocalDateTime modifyDate;
+    private Set<UserDto> voter;
 
     /*\
     static : 내부 클래스를 정의하기 위해서

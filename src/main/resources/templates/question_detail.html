@@ -18,6 +18,9 @@
                 </div>
             </div>
             <!--
+                    추천
+                    question.voter : 추천 수
+
                     #authentication.getPrincipal()은 타임리프에서 스프링 시큐리티와 함께 사용하는 표현식
                     [수정] 버튼이 로그인한 사용자와 글쓴이가 동일할 경우에만 노출되도록
 
@@ -29,6 +32,11 @@
                     [삭제] 버튼을 클릭했을 때 ‘정말로 삭제하시겠습니까?’와 같은 메시지와 함께 별도의 확인 절차를 중간에 끼워 넣기 위해서
             -->
             <div class="my-3">
+                <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+                    th:data-uri="@{|/question/vote/${question.id}|}">
+                    추천
+                    <span class="badge rounded-pill bg-success" th:text="${#lists.size(question.voter)}"></span>
+                </a>
                 <a th:href="@{|/question/modify/${question.id}|}" class="btn btn-sm btn-outline-secondary"
                     sec:authorize="isAuthenticated()"
                     th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
@@ -63,6 +71,11 @@
                 로그인한 사용자와 답변 작성자가 동일한 경우 답변의 [수정] 버튼이 노출
                 -->
                 <div class="my-3">
+                    <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+                        th:data-uri="@{|/answer/vote/${answer.id}|}">
+                        추천
+                        <span class="badge rounded-pill bg-success" th:text="${#lists.size(answer.voter)}"></span>
+                    </a>
                     <a th:href="@{|/answer/modify/${answer.id}|}" class="btn btn-sm btn-outline-secondary"
                         sec:authorize="isAuthenticated()"
                         th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
@@ -88,6 +101,16 @@
     Array.from(delete_elements).forEach(function(element) {
         element.addEventListener('click', function() {
             if(confirm("정말로 삭제하시겠습니까?")) {
+                location.href = this.dataset.uri;
+            };
+        });
+    });
+
+    const recommend_elements = document.getElementsByClassName("recommend");
+
+    Array.from(recommend_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            if(confirm("정말로 추천하시겠습니까?")) {
                 location.href = this.dataset.uri;
             };
         });

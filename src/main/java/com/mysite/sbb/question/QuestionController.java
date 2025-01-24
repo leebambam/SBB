@@ -152,4 +152,17 @@ public class QuestionController {
         this.questionService.delete(questionDto);
         return "redirect:/";
     }
+
+    // 사용자(siteUser)를 추천인(voter)으로 저장
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/vote/{id}")
+    public String questionVote(Principal principal, @PathVariable("id") Integer id) {
+
+        QuestionDto questionDto = this.questionService.getQuestion(id);
+        UserDto userDto = this.userService.getUser(principal.getName());
+
+        this.questionService.vote(questionDto, userDto);
+
+        return String.format("redirect:/question/detail/%s", id);
+    }
 }
