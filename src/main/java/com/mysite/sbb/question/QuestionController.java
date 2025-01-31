@@ -46,9 +46,11 @@ public class QuestionController {
 
     */
     @GetMapping("/list")
-    public String list(Model model, @RequestParam(value="page", defaultValue = "0") int page) {
-        Page<QuestionDto> paging = this.questionService.getList(page);
+    public String list(Model model, @RequestParam(value="page", defaultValue = "0") int page,
+                        @RequestParam(value = "kw", defaultValue = "")String kw) {
+        Page<QuestionDto> paging = this.questionService.getList(page, kw);
         model.addAttribute("paging", paging);
+        model.addAttribute("kw", kw); // 그리고 화면에서 입력한 검색어를 화면에 그대로 유지하기 위해
         return "question_list";
     }
 
