@@ -38,6 +38,7 @@ public class AnswerController {
 
     */
 
+    // 답변 등록
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create/{id}")
     public String createAnswer(Model model, @PathVariable("id") Integer id,
@@ -49,8 +50,11 @@ public class AnswerController {
             model.addAttribute("question", question);
             return "question_detail";
         }
-        this.answerService.create(question, answerForm.getContent(), userDto);
-        return String.format("redirect:/question/detail/%s", id);
+
+        //this.answerService.create(question, answerForm.getContent(), userDto);
+        //return String.format("redirect:/question/detail/%s", id);
+        AnswerDto answerDto = this.answerService.create(question, answerForm.getContent(), userDto);
+        return String.format("redirect:/question/detail/%s#answer_%s", answerDto.getQuestion().getId(), answerDto.getId());
     }
 
     // 답변 조회하기
@@ -81,7 +85,8 @@ public class AnswerController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
         this.answerService.modify(answerDto, answerForm.getContent());
-        return String.format("redirect:/question/detail/%s", answerDto.getQuestion().getId());
+        //return String.format("redirect:/question/detail/%s", answerDto.getQuestion().getId());
+        return String.format("redirect:/question/detail/%s#answer_%s", answerDto.getQuestion().getId(), answerDto.getId());
     }
 
     // 답변 삭제하기
@@ -107,6 +112,7 @@ public class AnswerController {
         UserDto userDto = this.userService.getUser(principal.getName());
 
         this.answerService.vote(answerDto, userDto);
-        return String.format("redirect:/question/detail/%s", answerDto.getQuestion().getId());
+        //return String.format("redirect:/question/detail/%s", answerDto.getQuestion().getId());
+        return String.format("redirect:/question/detail/%s#answer_%s", answerDto.getQuestion().getId(), answerDto.getId());
     }
 }

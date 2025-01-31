@@ -51,7 +51,7 @@ public class AnswerService {
         답변 내용을 저장할 때 글쓴이 데이터도 저장 : 객체로 UserDto 추가
 
     */
-    public void create(QuestionDto questionDto, String content, UserDto userDto) {
+    public AnswerDto create(QuestionDto questionDto, String content, UserDto userDto) {
         //AnswerMapper mapper = AnswerMapper.INSTANCE;
 
         // QuestionDto를 Question 엔티티로 변환
@@ -65,7 +65,9 @@ public class AnswerService {
         // DTO를 엔티티로 변환
         Answer answer = answerMapper.toEntity(answerDto);
 
-        this.answerRepository.save(answer);
+        Answer savedAnswer = this.answerRepository.save(answer);
+
+        return answerMapper.toDto(savedAnswer);
     }
 
 
