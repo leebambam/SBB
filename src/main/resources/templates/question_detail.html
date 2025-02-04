@@ -52,7 +52,8 @@
     </div>
     <h5 class="border-bottom my-3 py-2" 
         th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
-    <div th:each="answer : ${question.answerList}">
+    <!--<div th:each="answer : ${question.answerList}">-->
+    <div th:each="answer : ${question.answerPage.content}">
         <div class="card my-3">
             <a th:id="|answer_${answer.id}|"></a>
             <div class="card-body">
@@ -92,6 +93,32 @@
             </div>
         </div>
     </div>
+    <div th:if="${question.answerPage.totalPages > 1}">
+        <ul class="pagination justify-content-center">
+            <!-- 이전 페이지 -->
+            <li class="page-item" th:classappend="${!question.answerPage.hasPrevious()} ? 'disabled'">
+                <a class="page-link" th:href="@{|?page=${question.answerPage.number-1}|}">
+                    <span>이전</span>
+                </a>
+            </li>
+
+            <!-- 페이지 번호 -->
+            <li th:each="page: ${#numbers.sequence(0, question.answerPage.totalPages - 1)}"
+                th:if="${page >= question.answerPage.number - 5 and page <= question.answerPage.number + 5}"
+                th:classappend="${page == question.answerPage.number} ? 'active'" class="page-item">
+                <a th:text="${page}" class="page-link" th:href="@{|?page=${page}|}"></a>
+                <!--<a class="page-link" href="javascript:void(0)" th:data-page="${page}" th:text="${page + 1}"></a>-->
+            </li>
+
+            <!-- 다음 페이지 -->
+            <li class="page-item" th:classappend="${!question.answerPage.hasNext()} ? 'disabled'">
+                <a class="page-link" th:href="@{|?page=${question.answerPage.number+1}|}">
+                    <span>다음</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
     <form th:action="@{|/answer/create/${question.id}|}" th:object="${answerForm}" method="post" class="my-3">
         <div th:replace="form_errors :: formErrorsFragment"></div>
         <textarea sec:authorize="isAnonymous()" disabled th:field="*{content}" class="form-control" rows="10"></textarea>

@@ -6,6 +6,8 @@ import com.mysite.sbb.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -54,10 +56,20 @@ public class QuestionController {
         return "question_list";
     }
 
-    @RequestMapping(value = "/detail/{id}")
+/*    @RequestMapping(value = "/detail/{id}")
     public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm) {
         //Question question = this.questionService.getQuestion(id);
         QuestionDto question = this.questionService.getQuestion(id);
+        model.addAttribute("question", question);
+        return "question_detail";
+    }*/
+
+    // 질문 및 답변 상세 조회 페이지(+ )
+    @GetMapping("/detail/{id}")
+    public String detail(Model model, @PathVariable("id") Integer id,
+                            @RequestParam(value="page", defaultValue = "0") int page,
+                            AnswerForm answerForm) {
+        QuestionDto question = questionService.getQuestion(id, page);
         model.addAttribute("question", question);
         return "question_detail";
     }

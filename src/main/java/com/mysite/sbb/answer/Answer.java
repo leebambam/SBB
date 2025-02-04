@@ -1,14 +1,15 @@
 package com.mysite.sbb.answer;
 
-import java.time.LocalDateTime;
-import java.util.Set;
+import com.mysite.sbb.question.Question;
+import com.mysite.sbb.user.SiteUser;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-
-import com.mysite.sbb.question.Question;
-
-import com.mysite.sbb.user.SiteUser;
-import lombok.*;
+import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 //@Setter

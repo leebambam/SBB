@@ -1,7 +1,7 @@
 package com.mysite.sbb.question;
 
 import com.mysite.sbb.DataNotFoundException;
-import com.mysite.sbb.answer.Answer;
+import com.mysite.sbb.answer.*;
 import com.mysite.sbb.user.SiteUser;
 import com.mysite.sbb.user.UserDto;
 import com.mysite.sbb.user.UserMapper;
@@ -12,12 +12,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -26,6 +28,8 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final QuestionMapper questionMapper;
     private final UserMapper userMapper;
+    private final AnswerRepository answerRepository;
+    private final AnswerMapper answerMapper;
 
 
     /*
@@ -93,11 +97,36 @@ public class QuestionService {
     }
     */
 
+    @Transactional
     public QuestionDto getQuestion(Integer id) {
         Optional<Question> question = this.questionRepository.findById(id);
         if (question.isPresent()) {
            // return QuestionDto.fromEntity(question.get());
             return questionMapper.toDto(question.get()); // MapStruct로 변환
+        } else {
+            throw new DataNotFoundException("question not found");
+        }
+    }
+
+
+    public QuestionDto getQuestion(Integer id, int page) {
+        Optional<Question> question = questionRepository.findById(id);
+        if (question.isPresent()) {
+            // QuestionDto를 가져오고, 해당 질문에 대한 페이징된 답변을 가져옵니다.
+            QuestionDto questionDto = questionMapper.toDto(question.get());
+
+            List<Sort.Order> sorts = new ArrayList<>();
+            sorts.add(Sort.Order.desc("createDate"));
+            Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+
+            // 답변 목록 가져오기
+            Page<Answer> answersPage = answerRepository.findByQuestionId(id, pageable);
+
+            questionDto = questionDto.toBuilder()
+                    .answerPage(answerMapper.toDtoPage(answersPage)) // Page<AnswerDto>로 변환하여 설정
+                    .build();
+
+            return questionDto;
         } else {
             throw new DataNotFoundException("question not found");
         }

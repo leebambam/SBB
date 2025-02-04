@@ -1,6 +1,7 @@
 package com.mysite.sbb.question;
 
 import com.mysite.sbb.answer.Answer;
+import com.mysite.sbb.answer.AnswerDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -30,16 +31,20 @@ public interface QuestionMapper {
 
     // 엔티티 → DTO 변환
     @Mapping(target = "answerList", source = "answerList") // Question의 answerList 필드를 QuestionDto의 answerList에 매핑.
+    //@Mapping(target = "answerPage", source = "answerPage")
     QuestionDto toDto(Question question);
 
     // DTO → 엔티티 변환
     @Mapping(target = "answerList", source = "answerList")
+    //@Mapping(target = "answerPage", source = "answerPage")
     Question toEntity(QuestionDto questionDto);
 
     // 엔티티 리스트 → DTO 리스트 변환
     List<QuestionDto> toDtoList(List<Question> questions);
 
-
+/*    default Page<QuestionDto> toDtoList(Page<Question> questions) {
+        return questions.map(this::toDto); // Page<Question>를 Page<QuestionDto>로 변환
+    }*/
     /*
     questions : Page<Question> 객체로, 스프링 데이터 JPA에서 지원하는 페이징 클래스
 
@@ -62,4 +67,6 @@ public interface QuestionMapper {
     default Page<QuestionDto> toDto(Page<Question> questions) {
         return questions.map(this::toDto); // map 메서드로 각 엔티티를 변환
     }
+
+
 }

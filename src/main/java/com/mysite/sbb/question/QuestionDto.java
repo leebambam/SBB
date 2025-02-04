@@ -1,10 +1,11 @@
 package com.mysite.sbb.question;
 
 import com.mysite.sbb.answer.Answer;
-import com.mysite.sbb.user.SiteUser;
+import com.mysite.sbb.answer.AnswerDto;
 import com.mysite.sbb.user.UserDto;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +22,8 @@ public class QuestionDto {
     private UserDto author;
     private LocalDateTime modifyDate;
     private Set<UserDto> voter;
+    private Page<AnswerDto> answerPage; // 페이징된 답변 목록
+
 
     /*\
     static : 내부 클래스를 정의하기 위해서
