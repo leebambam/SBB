@@ -18,6 +18,7 @@ public class AnswerDto {
     private UserDto author;
     private LocalDateTime modifyDate;
     private Set<UserDto> voter;
+    private int voteCount;
 
     /*
 

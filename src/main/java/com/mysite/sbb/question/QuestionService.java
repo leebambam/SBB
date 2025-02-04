@@ -109,15 +109,24 @@ public class QuestionService {
     }
 
 
-    public QuestionDto getQuestion(Integer id, int page) {
+    public QuestionDto getQuestion(Integer id, int page, String sort) {
         Optional<Question> question = questionRepository.findById(id);
         if (question.isPresent()) {
             // QuestionDto를 가져오고, 해당 질문에 대한 페이징된 답변을 가져옵니다.
             QuestionDto questionDto = questionMapper.toDto(question.get());
 
             List<Sort.Order> sorts = new ArrayList<>();
-            sorts.add(Sort.Order.desc("createDate"));
-            Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+
+            // sort 값이 "recommend"이면 추천 개수(voter.size)를 기준으로 정렬
+            if ("recommend".equals(sort)) {
+                sorts.add(Sort.Order.desc("voteCount")); // 추천순 정렬
+                sorts.add(Sort.Order.desc("createDate")); // 동일한 추천 수일 경우 최신순 정렬
+            } else {
+                sorts.add(Sort.Order.desc("createDate")); // 기본값: 추천순 정렬
+            }
+
+            // sorts.add(Sort.Order.desc("createDate"));
+            Pageable pageable = PageRequest.of(page, 5, Sort.by(sorts));
 
             // 답변 목록 가져오기
             Page<Answer> answersPage = answerRepository.findByQuestionId(id, pageable);

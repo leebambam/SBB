@@ -68,9 +68,12 @@ public class QuestionController {
     @GetMapping("/detail/{id}")
     public String detail(Model model, @PathVariable("id") Integer id,
                             @RequestParam(value="page", defaultValue = "0") int page,
+                            @RequestParam(value = "sort", defaultValue = "latest") String sort,
+                            // 기본 정렬 방식은 "latest"
                             AnswerForm answerForm) {
-        QuestionDto question = questionService.getQuestion(id, page);
+        QuestionDto question = questionService.getQuestion(id, page, sort);
         model.addAttribute("question", question);
+        model.addAttribute("sort", sort);
         return "question_detail";
     }
 

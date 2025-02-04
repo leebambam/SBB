@@ -52,6 +52,10 @@
     </div>
     <h5 class="border-bottom my-3 py-2" 
         th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
+    <div class="mb-3 text-end">
+        <a th:href="@{|?page=${page != null ? page : 0}&sort=latest|}" class="btn btn-sm btn-outline-secondary">최신순</a>
+        <a th:href="@{|?page=${page != null ? page : 0}&sort=recommend|}" class="btn btn-sm btn-outline-secondary">추천순</a>
+    </div>
     <!--<div th:each="answer : ${question.answerList}">-->
     <div th:each="answer : ${question.answerPage.content}">
         <div class="card my-3">
@@ -97,7 +101,7 @@
         <ul class="pagination justify-content-center">
             <!-- 이전 페이지 -->
             <li class="page-item" th:classappend="${!question.answerPage.hasPrevious()} ? 'disabled'">
-                <a class="page-link" th:href="@{|?page=${question.answerPage.number-1}|}">
+                <a class="page-link" th:href="@{|?page=${question.answerPage.number-1}sort=${sort}|}">
                     <span>이전</span>
                 </a>
             </li>
@@ -106,13 +110,13 @@
             <li th:each="page: ${#numbers.sequence(0, question.answerPage.totalPages - 1)}"
                 th:if="${page >= question.answerPage.number - 5 and page <= question.answerPage.number + 5}"
                 th:classappend="${page == question.answerPage.number} ? 'active'" class="page-item">
-                <a th:text="${page}" class="page-link" th:href="@{|?page=${page}|}"></a>
+                <a th:text="${page}" class="page-link" th:href="@{|?page=${page}&sort=${sort}|}"></a>
                 <!--<a class="page-link" href="javascript:void(0)" th:data-page="${page}" th:text="${page + 1}"></a>-->
             </li>
 
             <!-- 다음 페이지 -->
             <li class="page-item" th:classappend="${!question.answerPage.hasNext()} ? 'disabled'">
-                <a class="page-link" th:href="@{|?page=${question.answerPage.number+1}|}">
+                <a class="page-link" th:href="@{|?page=${question.answerPage.number+1}&sort=${sort}|}">
                     <span>다음</span>
                 </a>
             </li>

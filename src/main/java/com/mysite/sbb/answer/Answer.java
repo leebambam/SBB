@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -48,6 +49,10 @@ public class Answer {
 
     @ManyToMany
     Set<SiteUser> voter;
+
+    // 추천 수 계산을 위한 필드 추가
+    @Formula("(select count(*) from answer_voter av where av.answer_id = id)")
+    private int voteCount;
 
     // 향후 사용 가능한지 체크~
     public Answer(String content, LocalDateTime createDate, Question question) {
