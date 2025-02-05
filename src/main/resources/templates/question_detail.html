@@ -53,8 +53,8 @@
     <h5 class="border-bottom my-3 py-2" 
         th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h5>
     <div class="mb-3 text-end">
-        <a th:href="@{|?page=${page != null ? page : 0}&sort=latest|}" class="btn btn-sm btn-outline-secondary">최신순</a>
-        <a th:href="@{|?page=${page != null ? page : 0}&sort=recommend|}" class="btn btn-sm btn-outline-secondary">추천순</a>
+        <!--<a th:href="@{|?page=${page != null ? page : 0}&sort=latest|}" class="btn btn-sm btn-outline-secondary">최신순</a>
+        <a th:href="@{|?page=${page != null ? page : 0}&sort=recommend|}" class="btn btn-sm btn-outline-secondary">추천순</a>-->
     </div>
     <!--<div th:each="answer : ${question.answerList}">-->
     <div th:each="answer : ${question.answerPage.content}">

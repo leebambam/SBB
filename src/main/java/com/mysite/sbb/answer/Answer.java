@@ -1,5 +1,6 @@
 package com.mysite.sbb.answer;
 
+import com.mysite.sbb.comment.Comment;
 import com.mysite.sbb.question.Question;
 import com.mysite.sbb.user.SiteUser;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -49,6 +51,9 @@ public class Answer {
 
     @ManyToMany
     Set<SiteUser> voter;
+
+    @OneToMany(mappedBy = "answer", cascade = CascadeType.REMOVE)
+    private List<Comment> commentList;
 
     // 추천 수 계산을 위한 필드 추가
     @Formula("(select count(*) from answer_voter av where av.answer_id = id)")

@@ -1,11 +1,14 @@
 package com.mysite.sbb.answer;
 
+import com.mysite.sbb.comment.Comment;
+import com.mysite.sbb.comment.CommentDto;
 import com.mysite.sbb.question.QuestionDto;
 import com.mysite.sbb.user.UserDto;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -19,6 +22,7 @@ public class AnswerDto {
     private LocalDateTime modifyDate;
     private Set<UserDto> voter;
     private int voteCount;
+    private List<CommentDto> commentList;
 
     /*
 

@@ -8,6 +8,7 @@ import javax.persistence.*;
 
 import com.mysite.sbb.answer.Answer;
 
+import com.mysite.sbb.comment.Comment;
 import com.mysite.sbb.user.SiteUser;
 import lombok.*;
 
@@ -48,4 +49,7 @@ public class Question {
     */
     @ManyToMany
     Set<SiteUser> voter;
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
+    private List<Comment> commentList;
 }
