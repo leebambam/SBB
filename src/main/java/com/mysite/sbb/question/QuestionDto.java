@@ -2,6 +2,8 @@ package com.mysite.sbb.question;
 
 import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.answer.AnswerDto;
+import com.mysite.sbb.comment.Comment;
+import com.mysite.sbb.comment.CommentDto;
 import com.mysite.sbb.user.UserDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,6 +25,7 @@ public class QuestionDto {
     private LocalDateTime modifyDate;
     private Set<UserDto> voter;
     private Page<AnswerDto> answerPage; // 페이징된 답변 목록
+    private List<CommentDto> commentList;
 
 
     /*\
