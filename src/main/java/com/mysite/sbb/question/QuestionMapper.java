@@ -2,6 +2,7 @@ package com.mysite.sbb.question;
 
 import com.mysite.sbb.answer.Answer;
 import com.mysite.sbb.answer.AnswerDto;
+import com.mysite.sbb.answer.AnswerMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -25,12 +26,13 @@ import java.util.List;
 
 */
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {AnswerMapper.class})
 public interface QuestionMapper {
     // QuestionMapper INSTANCE = Mappers.getMapper(QuestionMapper.class);
 
     // 엔티티 → DTO 변환
     @Mapping(target = "answerList", source = "answerList") // Question의 answerList 필드를 QuestionDto의 answerList에 매핑.
+    @Mapping(target = "answerPage", ignore = true)
     //@Mapping(target = "answerPage", source = "answerPage")
     QuestionDto toDto(Question question);
 

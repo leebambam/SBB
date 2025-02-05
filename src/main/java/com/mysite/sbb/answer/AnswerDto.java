@@ -4,6 +4,7 @@ import com.mysite.sbb.question.QuestionDto;
 import com.mysite.sbb.user.UserDto;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -18,6 +19,7 @@ public class AnswerDto {
     private UserDto author;
     private LocalDateTime modifyDate;
     private Set<UserDto> voter;
+    private Page<AnswerDto> answerPage;
 
     /*
 
