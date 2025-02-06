@@ -25,7 +25,6 @@ public class QuestionDto {
     private LocalDateTime modifyDate;
     private Set<UserDto> voter;
     private Page<AnswerDto> answerPage; // 페이징된 답변 목록
-    private List<CommentDto> commentList;
 
 
     /*\

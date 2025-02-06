@@ -6,6 +6,7 @@ import com.mysite.sbb.question.QuestionDto;
 import com.mysite.sbb.user.UserDto;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,8 +22,9 @@ public class AnswerDto {
     private UserDto author;
     private LocalDateTime modifyDate;
     private Set<UserDto> voter;
-    private int voteCount;
+    //private int voteCount;
     private List<CommentDto> commentList;
+    private Page<AnswerDto> answerPage;
 
     /*
 

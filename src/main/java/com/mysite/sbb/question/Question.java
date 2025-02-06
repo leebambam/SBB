@@ -50,6 +50,4 @@ public class Question {
     @ManyToMany
     Set<SiteUser> voter;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
-    private List<Comment> commentList;
 }
