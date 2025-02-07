@@ -14,7 +14,7 @@ public interface AnswerMapper {
     // Answer -> AnswerDto 변환
     @Mapping(source = "question", target = "question") // QuestionDto 매핑
     @Mapping(source = "commentList", target = "commentList") // CommentDto 매핑
-    @Mapping(target = "answerPage", ignore = true)
+    //@Mapping(target = "answerPage", ignore = true)
     AnswerDto toDto(Answer answer);
 
     // AnswerDto -> Answer 변환

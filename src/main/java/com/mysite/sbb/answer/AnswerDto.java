@@ -24,7 +24,7 @@ public class AnswerDto {
     private Set<UserDto> voter;
     //private int voteCount;
     private List<CommentDto> commentList;
-    private Page<AnswerDto> answerPage;
+    //private Page<AnswerDto> answerPage;
 
     /*
 

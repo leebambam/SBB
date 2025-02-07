@@ -7,10 +7,12 @@ import com.mysite.sbb.question.QuestionDto;
 import com.mysite.sbb.user.UserDto;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @Builder
 public class CommentDto {
     private Integer id;
