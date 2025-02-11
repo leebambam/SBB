@@ -66,6 +66,7 @@ public class UserService {
             // 임시 비밀번호 암호화 후 저장
             SiteUser updatedUser = siteUser.toBuilder()
                     .password(passwordEncoder.encode(tempPassword))
+                    .tempPassword(true)
                     .build();
 
             userRepository.save(updatedUser);
@@ -91,5 +92,29 @@ public class UserService {
         }
 
         return password.toString();
+    }
+
+    // id로 사용자 찾기
+    public UserDto findByUsername(String username) {
+        Optional<SiteUser> siteUser  = userRepository.findByusername(username);
+
+        if (siteUser.isPresent()) {
+            return this.userMapper.toDto(siteUser.get());
+        } else  {
+            throw new DataNotFoundException("사용자를 찾을 수 없습니다: " + username);
+        }
+    }
+
+    // 비밀번호 변경
+    public void updatePassword(UserDto userDto, String newPassword) {
+        if (userDto.getId() == null) {  // ✅ ID 값이 없으면 예외 발생
+            throw new IllegalStateException("User ID is missing. Cannot update password.");
+        }
+        userDto.setPassword(passwordEncoder.encode(newPassword));
+        userDto.setTempPassword(false); // ✅ 임시 비밀번호 상태 해제
+
+        SiteUser user = userMapper.toEntity(userDto);
+        userRepository.save(user);
+
     }
 }

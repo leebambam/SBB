@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +28,7 @@ public class UserController {
     // private static final Logger logger = LoggerFactory.getLogger(UserController.class); // Logger 생성
     private final UserService userService;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/signup")
     public String signup(UserCreateForm userCreateForm) {
@@ -80,6 +84,7 @@ public class UserController {
         return "find_password";
     }
 
+    // 비밀번호 찾기
     @PostMapping("/find_password")
     public String processFindPassword(@Valid FindPasswordDto findPasswordDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -99,5 +104,44 @@ public class UserController {
         }
 
         return "redirect:/user/login?resetSuccess";  // 성공 시 로그인 페이지로 이동
+    }
+
+    // 비밀번호 변경 페이지
+    @GetMapping("/change_password")
+    public String showChangePasswordForm(ChangePasswordDto changePasswordDto) {
+        return "change_password";
+    }
+
+    // 비밀번호 변경
+    @PostMapping("/change_password")
+    public String changePassword(ChangePasswordDto changePasswordDto, BindingResult bindingResult,
+                                    @AuthenticationPrincipal UserDetails userDetails){
+            //,RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            return "change_password";
+        }
+
+        String username = userDetails.getUsername();
+        UserDto userDto = userService.findByUsername(username);
+
+
+        // 현재 비밀번호 확인
+        if (!passwordEncoder.matches(changePasswordDto.getOldPassword(), userDto.getPassword())) {
+            bindingResult.rejectValue("oldPassword", "invalid", "현재 비밀번호가 일치하지 않습니다.");
+            return "change_password";
+        }
+
+        // 새 비밀번호 확인
+        if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())) {
+            bindingResult.rejectValue("confirmPassword", "mismatch", "새 비밀번호가 일치하지 않습니다.");
+            return "change_password";
+            //return "redirect:/user/change_password"; 리디렉트 시 BindingResult의 에러 메시지가 유지되지 않음.
+        }
+
+        // 비밀번호 변경 및 임시 비밀번호 해제
+        userService.updatePassword(userDto, changePasswordDto.getNewPassword());
+
+        return "redirect:/user/login";
     }
 }

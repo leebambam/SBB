@@ -25,4 +25,9 @@ public class SiteUser {
 
     @Column(unique = true)
     private String email;
+
+    @Column(nullable = false)
+    @Builder.Default
+    //임시 비밀번호 여부 확인 (true: 임시 비밀번호 사용 중)
+    private boolean tempPassword = false; // 기본값 false
 }

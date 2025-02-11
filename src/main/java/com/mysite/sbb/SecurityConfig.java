@@ -1,5 +1,6 @@
 package com.mysite.sbb;
 
+import com.mysite.sbb.user.CustomLoginSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,13 +19,14 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 // QuestionController와 AnswerController에서 로그인 여부를 판별할 때 사용한 @PreAuthorize 애너테이션을 사용하기 위해 반드시 필요한 설정
 public class SecurityConfig {
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http, CustomLoginSuccessHandler loginSuccessHandler ) throws Exception {
         http
                 .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
                         .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
                 .formLogin((formLogin) -> formLogin //  로그인 설정
                         .loginPage("/user/login")
-                        .defaultSuccessUrl("/"))
+                        .successHandler(loginSuccessHandler)) // 로그인 성공 시 핸들러 실행
+                        //.defaultSuccessUrl("/"))
                 .logout((logout) -> logout // 로그 아웃 설정
                         .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
                         .logoutSuccessUrl("/")
