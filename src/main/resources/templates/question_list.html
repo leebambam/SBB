@@ -11,6 +11,50 @@
             </div>
         </div>
     </div>
+
+
+    <!-- 탭 네비게이션 -->
+    <div class="container my-3">
+        <ul class="nav nav-tabs" id="searchTabs">
+            <li class="nav-item">
+                <a class="nav-link active" id="daily-tab" data-bs-toggle="tab" href="#daily-search">일별 조회</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="monthly-tab" data-bs-toggle="tab" href="#monthly-search">월별 조회</a>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-3">
+            <!-- ✅ 일별 조회 -->
+            <div class="tab-pane fade show active" id="daily-search">
+                <div class="row">
+                    <div class="col">
+                        <input type="date" id="startDate" class="form-control" name="startDate" th:value="${startDate}">
+                    </div>
+                    <div class="col">
+                        <input type="date" id="endDate" class="form-control" name="endDate" th:value="${endDate}">
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-primary" id="btn_search_date">검색</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ✅ 월별 조회 -->
+            <div class="tab-pane fade" id="monthly-search">
+                <div class="row">
+                    <div class="col">
+                        <input type="month" id="searchMonth" class="form-control" name="searchMonth" th:value="${searchMonth}">
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-primary" id="btn_search_month">검색</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+
+
     <table class="table">
         <thead class="table-dark">
             <tr class="text-center">
@@ -77,12 +121,27 @@
         브라우저는 동일한 POST 요청이 발생할 경우,
         예를 들어 2페이지에서 3페이지로 이동한 후 '뒤로가기'를 통해 2페이지로 이동하는 것과 같은
         중복 요청을 방지하기 위해 '만료된 페이지입니다.'라는 오류를 발생시키기 때문.
+
+        hidden 역할 :
+        - 사용자가 검색어, 날짜, 월을 입력하면, 이 값들을 hidden input에 저장한 후 서버로 전송.
+        - 사용자가 페이지를 이동하거나 다른 검색을 실행해도 기존 검색 조건을 유지할 수 있음.
+
     -->
     <form th:action="@{/question/list}" method="get" id="searchForm">
         <input type="hidden" id="kw" name="kw" th:value="${kw}">
         <input type="hidden" id="page" name="page" th:value="${paging.number}">
+        <!-- 날짜 검색 추가-->
+        <input type="hidden" id="hiddenStartDate" name="startDate" th:value="${startDate}">
+        <input type="hidden" id="hiddenEndDate" name="endDate" th:value="${endDate}">
+        <input type="hidden" id="hiddenSearchMonth" name="searchMonth" th:value="${searchMonth}">
     </form>
 </div>
+    <!--
+        - 페이징 처리
+        - 검색
+        - 일별 조회
+        - 월별 조회
+    -->
 <script layout:fragment="script" type='text/javascript'>
     const page_elements = document.getElementsByClassName("page-link");
     Array.from(page_elements).forEach(function(element) {
@@ -95,6 +154,26 @@
     btn_search.addEventListener('click', function() {
         document.getElementById('kw').value = document.getElementById('search_kw').value;
         document.getElementById('page').value = 0;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
+        document.getElementById('searchForm').submit();
+    });
+
+    const btn_search_date = document.getElementById("btn_search_date");
+    btn_search_date.addEventListener('click', function() {
+        document.getElementById('kw').value = "";  // 키워드 검색 초기화
+        document.getElementById('page').value = 0;  // 검색 초기화
+        document.getElementById('hiddenStartDate').value = document.getElementById('startDate').value;
+        document.getElementById('hiddenEndDate').value = document.getElementById('endDate').value;
+        document.getElementById('hiddenSearchMonth').value = ""; // 월별 조회 초기화
+        document.getElementById('searchForm').submit(); // hidden input 값을 서버로 전송
+    });
+
+    const btn_search_month = document.getElementById("btn_search_month");
+    btn_search_month.addEventListener('click', function() {
+        document.getElementById('kw').value = "";  // 키워드 검색 초기화
+        document.getElementById('page').value = 0;  // 검색 초기화
+        document.getElementById('hiddenSearchMonth').value = document.getElementById('searchMonth').value;
+        document.getElementById('hiddenStartDate').value = ""; // 일별 조회 초기화
+        document.getElementById('hiddenEndDate').value = "";
         document.getElementById('searchForm').submit();
     });
 </script>

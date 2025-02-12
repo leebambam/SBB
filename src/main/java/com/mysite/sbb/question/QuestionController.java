@@ -6,6 +6,7 @@ import com.mysite.sbb.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -16,6 +17,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 @RequestMapping("/question")
@@ -45,12 +48,39 @@ public class QuestionController {
     첫 번째 파라미터는 ? 기호를 사용하고 그 이후 추가되는 값은 & 기호를 사용한다.
 
     */
+
+    // 질문 조회 및 검색 기능
     @GetMapping("/list")
     public String list(Model model, @RequestParam(value="page", defaultValue = "0") int page,
-                        @RequestParam(value = "kw", defaultValue = "")String kw) {
-        Page<QuestionDto> paging = this.questionService.getList(page, kw);
+                        @RequestParam(value = "kw", defaultValue = "")String kw,
+                        @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                        @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                        @RequestParam(value = "searchMonth", required = false) String searchMonth) {
+
+        // Page<QuestionDto> paging = this.questionService.getList(page, kw);
+        Page<QuestionDto> paging;
+
+        if (startDate != null && endDate != null) {
+            // 기간 조회 (일별 조회)
+            paging = questionService.getListByDateRange(startDate, endDate, page);
+        } else if (searchMonth != null && !searchMonth.isEmpty()) {
+            // 월별 조회
+            YearMonth yearMonth = YearMonth.parse(searchMonth);
+            paging = questionService.getListByMonth(yearMonth, page);
+        } else {
+            // 기본 조회 (키워드 검색)
+            paging = questionService.getList(page, kw);
+        }
+
+
+
+
         model.addAttribute("paging", paging);
         model.addAttribute("kw", kw); // 그리고 화면에서 입력한 검색어를 화면에 그대로 유지하기 위해
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("searchMonth", searchMonth);
+
         return "question_list";
     }
 

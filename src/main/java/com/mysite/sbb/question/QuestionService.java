@@ -14,7 +14,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -132,7 +134,7 @@ public class QuestionService {
         this.questionRepository.save(question);
     }
 
-
+    // 목록 조회 + 페이징, 검색
     public Page<QuestionDto> getList(int page, String kw) {
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("createDate"));
@@ -142,6 +144,37 @@ public class QuestionService {
         return questionMapper.toDto(question);
 
     }
+
+    /*
+
+        startDate, endDate : LocalDate 타입
+
+        .atStartOfDay() : 그날의 00:00:00(자정) 으로 변환됨 -> 검색 시작 시간을 '해당 날짜의 00:00:00'로 설정
+        예) LocalDate.of(2024, 2, 1).atStartOfDay(); // 결과: 2024-02-01T00:00:00
+
+        .atTime(23, 59, 59) : 그날의 23:59:59 (밤 11시 59분 59초) 로 변환됨 -> 검색 종료 시간을 '해당 날짜의 23:59:59'로 설정
+        예) LocalDate.of(2024, 2, 10).atTime(23, 59, 59); // 결과: 2024-02-10T23:59:59
+
+    */
+    // 날짜 조회
+    public Page<QuestionDto> getListByDateRange(LocalDate startDate, LocalDate endDate, int page) {
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createDate"));
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+
+        Page<Question> question = this.questionRepository.findByCreateDateBetween(startDate.atStartOfDay(), endDate.atTime(23, 59, 59), pageable);
+        return questionMapper.toDto(question);
+    }
+
+    // 날짜 조회
+    public Page<QuestionDto> getListByMonth(YearMonth yearMonth, int page) {
+
+        LocalDate startDate = yearMonth.atDay(1);
+        LocalDate endDate = yearMonth.atEndOfMonth();
+
+        return getListByDateRange(startDate, endDate, page);
+    }
+
 
     // 질문 수정
     public void modify(QuestionDto questionDto, String subject, String content) {

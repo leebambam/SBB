@@ -1,5 +1,6 @@
 package com.mysite.sbb.question;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page; // 페이징을 위한 클래스
@@ -32,4 +33,6 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
     // Specification과 Pageable 객체를 사용하여 DB에서 Question 엔티티를 조회한 결과를 페이징
     Page<Question> findAll(Specification<Question> spec, Pageable pageable);
+
+    Page<Question> findByCreateDateBetween(LocalDateTime localDateTime, LocalDateTime localDateTime1, Pageable pageable);
 }
