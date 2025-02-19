@@ -1,7 +1,11 @@
 package com.mysite.sbb.user;
 
+import com.mysite.sbb.question.Question;
+import com.mysite.sbb.question.QuestionDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -20,4 +24,6 @@ public interface UserMapper {
     @Mapping(target = "password", source = "password1")
     @Mapping(target = "tempPassword", ignore = true)  // 매핑 제외
     UserDto formToDto(UserCreateForm userCreateForm);
+
+    List<UserDto> toDtoList(List<SiteUser> siteUsers);
 }
