@@ -24,6 +24,7 @@ public class UserService {
                 .username(userDto.getUsername())
                 .email(userDto.getEmail())
                 .password(passwordEncoder.encode(userDto.getPassword()))
+                .phoneNumber(userDto.getPhoneNumber())
                 .build();
 
         // 저장 및 반환

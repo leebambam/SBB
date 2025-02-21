@@ -1,5 +1,6 @@
 package com.mysite.sbb.user;
 
+import com.mysite.sbb.message.SmsMapper;
 import com.mysite.sbb.question.Question;
 import com.mysite.sbb.question.QuestionDto;
 import org.mapstruct.Mapper;
@@ -7,7 +8,7 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = SmsMapper.class)
 public interface UserMapper {
 
     // 엔티티 → DTO 변환

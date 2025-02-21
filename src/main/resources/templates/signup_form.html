@@ -20,6 +20,10 @@
             <input type="password" th:field="*{password2}" class="form-control">
         </div>
         <div class="mb-3">
+            <label for="phoneNumber" class="form-label">핸드폰 번호</label>
+            <input type="text" th:field="*{phoneNumber}" class="form-control" pattern="\d{3}-\d{4}-\d{4}" placeholder="010-1234-5678">
+        </div>
+        <div class="mb-3">
             <label for="email" class="form-label">이메일</label>
             <input type="email" th:field="*{email}" class="form-control">
         </div>

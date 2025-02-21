@@ -1,11 +1,14 @@
 package com.mysite.sbb.user;
 
+import com.mysite.sbb.message.Sms;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -30,4 +33,10 @@ public class SiteUser {
     @Builder.Default
     //임시 비밀번호 여부 확인 (true: 임시 비밀번호 사용 중)
     private boolean tempPassword = false; // 기본값 false
+
+    @Column
+    private String phoneNumber;
+
+    /*@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Sms> smsList = new ArrayList<>();*/
 }
