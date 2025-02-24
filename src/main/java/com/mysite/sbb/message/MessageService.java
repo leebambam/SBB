@@ -21,19 +21,7 @@ public class MessageService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final MsgQueueRepository msgQueueRepository;
-    //private final MsgQueueMapper msgQueueMapper;
-
-    @Autowired
-    private MsgQueueMapper msgQueueMapper;
-
-    @Autowired
-    private ApplicationContext context;
-
-    public void testMapper() {
-        MsgQueueMapper mapper = context.getBean(MsgQueueMapper.class);
-        System.out.println("Mapper: " + mapper);
-    }
-
+    private final MsgQueueMapper msgQueueMapper;
 
     public List<UserDto> getUser() {
         List<SiteUser> siteUser = this.userRepository.findAll();
@@ -59,11 +47,7 @@ public class MessageService {
                                 .build())
                 .collect(Collectors.toList());
 
-        System.out.println("msgQueueDtoList: " + msgQueueDtoList);
-        System.out.println("msgQueueMapper: " + msgQueueMapper);
         List<MsgQueue> msgQueue = msgQueueMapper.toEntityList(msgQueueDtoList);
-        System.out.println("msgQueue: " + msgQueue);
-
 
         this.msgQueueRepository.saveAll(msgQueue);
     }

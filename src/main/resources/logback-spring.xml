@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- 콘솔 로그 패턴 설정
+
+        ConsoleAppender → 콘솔에 로그 출력
+    -->
+    <appender name="ConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 파일 로그 설정
+
+        FileAppender → log/sbb.log 파일에 로그 저장
+        Rolling Policy → 날짜별 로그 파일 분리
+    -->
+    <appender name="FileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/home/study/log/sbb.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/home/study/log/sbb-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 로그 레벨 설정
+
+        name="com.mysite.sbb" → 특정 패키지의 로그 설정 = 패키지 아래에 있는 모든 클래스의 로그 레벨을 설정함.
+        level="DEBUG" → 로그 레벨 지정 = DEBUG 이상의 로그(DEBUG, INFO, WARN, ERROR)만 출력함.
+        additivity="false" → 로그 중복 방지
+
+        ** logger name="com.mysite.sbb"
+        com.mysite.sbb 로거는 com.mysite.sbb 패키지에만 적용되는 하위 로거
+        com.mysite.sbb 패키지의 로그는 DEBUG 레벨부터 FileAppender에 기록됨.
+        additivity="false"라서 root 로거로 로그를 전달하지 않음.
+
+        로거 유형	            적용 대상	                역할
+        root 로거	            모든 패키지 (기본)	            프로젝트 전체의 기본 로깅을 설정
+        com.mysite.sbb 로거	    com.mysite.sbb 패키지만	    특정 패키지에 대한 로깅 규칙을 정의
+
+    -->
+    <logger name="com.mysite.sbb" level="DEBUG" additivity="false">
+        <appender-ref ref="ConsoleAppender"/>
+        <appender-ref ref="FileAppender"/>
+    </logger>
+
+    <!-- 기본 루트 로거 설정 -->
+    <root level="INFO">
+        <appender-ref ref="ConsoleAppender"/>
+        <appender-ref ref="FileAppender"/>
+    </root>
+
+</configuration>
