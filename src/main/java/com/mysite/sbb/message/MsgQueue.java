@@ -28,6 +28,7 @@ public class MsgQueue {
 
     private String custid; // 사용자 아이디
 
+    @Column(name = "request_time", columnDefinition = "DATETIME(0)")
     private LocalDateTime request_time;
 
 }

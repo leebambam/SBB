@@ -43,7 +43,7 @@ public class MessageService {
                                 .callback(smsDto.getSenderPhoneNumber())
                                 .text(smsDto.getMessageContent())
                                 .custid(userDto.getUsername())
-                                .request_time(LocalDateTime.now())
+                                .request_time(smsDto.getSendTime())
                                 .build())
                 .collect(Collectors.toList());
 

@@ -47,8 +47,34 @@
             <input type="text" th:field="*{senderPhoneNumber}" class="form-control" pattern="\d{3}-\d{4}-\d{4}" placeholder="010-1234-5678">
         </div>
 
+        <!-- 발송 유형 선택 + 예약 시간 (가로 정렬) -->
+        <div class="mb-5">
+            <label class="form-label">발송 유형</label>
+
+            <div class="d-flex align-items-center">
+                <!-- 즉시 발송 -->
+                <div class="form-check me-5">
+                    <input type="radio" th:field="*{sendType}" id="immediate" value="immediate" class="form-check-input" checked onclick="toggleReserve(false)">
+                    <label for="immediate" class="form-check-label">즉시 발송</label>
+                </div>
+
+                <!-- 예약 발송 -->
+                <div class="form-check me-3">
+                    <input type="radio" th:field="*{sendType}" id="reserve" value="reserve" class="form-check-input" onclick="toggleReserve(true)">
+                    <label for="reserve" class="form-check-label">예약 발송</label>
+                </div>
+
+                <!-- 예약 시간 입력 (예약 발송 선택 시만 표시) -->
+                <div id="sendTimeContainer" class="ms-3" style="display: none;">
+                    <input type="datetime-local" th:field="*{sendTime}" class="form-control">
+                </div>
+            </div>
+        </div>
         <input type="submit" value="전송하기" class="btn btn-primary my-2">
     </form>
+
+    <br>
+    <br>
 </div>
 <script layout:fragment="script" type='text/javascript'>
     function toggleAllCheckboxes(source) {
@@ -80,5 +106,10 @@
 
         event.target.submit(); // 수정된 값과 함께 폼 제출
     }
+
+    function toggleReserve(show) {
+        document.getElementById("sendTimeContainer").style.display = show ? "block" : "none";
+    }
+
 </script>
 </html>

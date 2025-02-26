@@ -1,5 +1,6 @@
 package com.mysite.sbb.message;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mysite.sbb.user.SiteUser;
 import com.mysite.sbb.user.UserDto;
 import lombok.Builder;
@@ -17,5 +18,5 @@ public class SmsDto {
     private UserDto user;
     private String messageContent;
     private String senderPhoneNumber;
-    //private LocalDateTime sendTime;
+    private LocalDateTime sendTime;
 }

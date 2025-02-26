@@ -6,10 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,10 +43,16 @@ public class MessageController {
             return "sms_form";
         }
 
+        // 즉시 발송이면 현재 시간 설정
+        if ("immediate".equals(smsForm.getSendType())) {
+            smsForm.setSendTime(LocalDateTime.now());
+        }
+
         //SmsDto smsDto = new SmsDto( principal.getName(), smsForm.getMessageContent(), smsForm.getSenderPhoneNumber());
         SmsDto smsDto = SmsDto.builder()
                 .messageContent(smsForm.getMessageContent())
                 .senderPhoneNumber(smsForm.getSenderPhoneNumber())
+                .sendTime(smsForm.getSendTime())
                 .build();
 
         UserDto userDto = this.userService.getUser(principal.getName());
