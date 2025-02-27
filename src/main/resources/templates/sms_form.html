@@ -2,7 +2,7 @@
 <div layout:fragment="content" class="container">
     <h5 class="my-3 border-bottom pb-2 bg-light p-2 rounded">SMS 전송</h5>
     <h6 class="my-3 pb-2 text-secondary">▶ 수신 대상 선택</h6>
-    <table class="table">
+    <table class="table" id="mainTable">
         <thead class="table">
         <tr class="text-center">
             <th>
@@ -20,13 +20,33 @@
                 <input type="checkbox" class="userCheckbox">
             </td>
             <td th:text="${stat.count}"></td>
-            <td><span th:text="${user.username}"></span></td>
+            <td user-id><span th:text="${user.username}"></span></td>
             <td data-phone><span th:if="${user.phoneNumber != null}" th:text="${user.phoneNumber}"></span></td>
             <td><span th:if="${user.email != null}" th:text="${user.email}"></span></td>
         </tr>
         </tbody>
     </table>
-
+    <button onclick="moveCheckedRows()" class="btn btn-primary my-2">선택 추가</button>
+    <br>
+    <br>
+    <h6 class="my-3 pb-2 text-secondary">▶ 수신 대상</h6>
+    <table class="table" id="selectedTable">
+        <thead class="table">
+        <tr class="text-center">
+            <th>
+                <input type="checkbox" id="selectSelectedAll" onclick="toggleAllSelectedCheckboxes(this)">
+            </th>
+            <th>번호</th>
+            <th >사용자 아이디</th>
+            <th>핸드폰번호</th>
+            <th>이메일</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <button onclick="removeCheckedRows()" class="btn btn-primary my-2">선택 삭제</button>
+    <br>
     <br>
     <h6 class="my-3 pb-2 text-secondary">▶ 발송 내용</h6>
     <form th:object="${smsForm}" method="post" onsubmit="addSelectedNumbers(event)">
@@ -77,6 +97,7 @@
     <br>
 </div>
 <script layout:fragment="script" type='text/javascript'>
+    // ✅ 수신 대상 전체 선택
     function toggleAllCheckboxes(source) {
         let checkboxes = document.querySelectorAll(".userCheckbox");
         checkboxes.forEach(checkbox => {
@@ -84,11 +105,20 @@
         });
     }
 
+    // ✅ 선택된 수신 대상 전체 선택
+    function toggleAllSelectedCheckboxes(source) {
+        let checkboxes = document.querySelectorAll(".selectedCheckbox");
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = source.checked;
+        });
+    }
+
+    // ✅ 발송 시 선택된 수신 대상 처리
     function addSelectedNumbers(event) {
         event.preventDefault(); // 폼 제출 방지 (체크된 값을 먼저 설정)
 
         let selectedNumbers = [];
-        let checkboxes = document.querySelectorAll(".userCheckbox:checked");
+        let checkboxes = document.querySelectorAll(".selectedCheckbox:checked");
         // .userCheckbox 클래스의 체크박스들을 모두 선택
 
         checkboxes.forEach(checkbox => {
@@ -107,9 +137,62 @@
         event.target.submit(); // 수정된 값과 함께 폼 제출
     }
 
+    // ✅ 예약 전송 시
     function toggleReserve(show) {
         document.getElementById("sendTimeContainer").style.display = show ? "block" : "none";
     }
+
+    // ✅ 선택 추가 기능
+    function moveCheckedRows() {
+        const mainTable = document.getElementById("mainTable");
+        const selectedTable = document.getElementById("selectedTable").getElementsByTagName("tbody")[0];
+        console.log(selectedTable);
+
+        document.querySelectorAll("#mainTable .userCheckbox:checked").forEach(checkbox => {
+            let row = checkbox.closest("tr");
+
+            let userIdElement = row.querySelector("td[user-id] span");
+            let userId = userIdElement.innerText;
+
+            // 중복 확인 (user-id 속성 기반)
+            if ([...selectedTable.rows].some(r => r.querySelector("td[user-id] span")?.innerText === userId)) {
+                return; // 중복 방지
+            }
+
+            let newRow = selectedTable.insertRow();
+            newRow.setAttribute("class", "text-center");
+
+            let newCell = newRow.insertCell();
+            newCell.innerHTML = '<input type="checkbox" class="selectedCheckbox" checked>';
+
+            for (let i = 1; i < row.cells.length; i++) {
+                let newCell = newRow.insertCell();
+                newCell.innerHTML = row.cells[i].innerHTML;
+
+                 // 핸드폰번호 칸인 경우 data-phone 속성 추가
+                if (row.cells[i].hasAttribute("data-phone")) {
+                    newCell.setAttribute("data-phone", "");
+                }
+
+                // 사용자 아이디 칸인 경우 user-id 속성 추가
+                if (row.cells[i].hasAttribute("user-id")) {
+                    newCell.setAttribute("user-id", "");
+                }
+            }
+        });
+
+        document.querySelectorAll("#mainTable .userCheckbox:checked").forEach(checkbox => {
+            checkbox.checked = false;
+        });
+    }
+
+    // ✅ 선택 삭제
+    function removeCheckedRows() {
+    document.querySelectorAll("#selectedTable .selectedCheckbox:checked").forEach(checkbox => {
+        checkbox.closest("tr").remove();
+    });
+}
+
 
 </script>
 </html>

@@ -3,6 +3,7 @@ package com.mysite.sbb.message;
 import com.mysite.sbb.user.UserDto;
 import com.mysite.sbb.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,7 @@ public class MessageController {
     private final MessageService messageService;
     private final UserService userService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/sms")
     //@ResponseBody // URL 요청에 대한 응답으로 문자열을 리턴하라는 의미
     public String sms(Model model, SmsForm smsForm){
