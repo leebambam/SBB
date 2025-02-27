@@ -56,7 +56,7 @@
 
         <div class="mb-3">
             <label for="messageContent" class="form-label">내용</label>
-            <textarea id="text" th:field="*{messageContent}" class="form-control" rows="10"></textarea>
+            <textarea id="messageContent" th:field="*{messageContent}" class="form-control" rows="10"></textarea>
         </div>
 
         <!-- 체크된 전화번호 -->
@@ -64,7 +64,7 @@
 
         <div class="mb-3">
             <label for="senderPhoneNumber" class="form-label">회신번호</label>
-            <input type="text" th:field="*{senderPhoneNumber}" class="form-control" pattern="\d{3}-\d{4}-\d{4}" placeholder="010-1234-5678">
+            <input type="text" id="senderPhoneNumber" th:field="*{senderPhoneNumber}" class="form-control" pattern="\d{3}-\d{4}-\d{4}" placeholder="010-1234-5678">
         </div>
 
         <!-- 발송 유형 선택 + 예약 시간 (가로 정렬) -->
@@ -113,13 +113,14 @@
         });
     }
 
+
+
     // ✅ 발송 시 선택된 수신 대상 처리
     function addSelectedNumbers(event) {
         event.preventDefault(); // 폼 제출 방지 (체크된 값을 먼저 설정)
 
         let selectedNumbers = [];
         let checkboxes = document.querySelectorAll(".selectedCheckbox:checked");
-        // .userCheckbox 클래스의 체크박스들을 모두 선택
 
         checkboxes.forEach(checkbox => {
             let phoneCell = checkbox.closest("tr").querySelector("td[data-phone] span");
@@ -131,11 +132,54 @@
             }
         });
 
+        // 1️⃣ 수신 대상자가 없는 경우
+        if (selectedNumbers.length === 0) {
+            alert("발송할 수신대상자가 없습니다.");
+            return;
+        }
+
+        // 2️⃣ 발송 내용이 입력되지 않은 경우
+        let messageContent = document.getElementById("messageContent").value.trim();
+        if (!messageContent) {
+            alert("발송내용을 입력하여 주세요.");
+            return;
+        }
+
+        // 3️⃣ 회신번호가 없는 경우
+        let replyNumber = document.getElementById("senderPhoneNumber").value.trim();
+        if (!replyNumber) {
+            alert("회신번호가 없습니다. 회신번호를 입력해주세요.");
+            return;
+        }
+
+         // 4️⃣ 예약발송일이 현재 날짜보다 이전이거나 같은 경우
+        let scheduledDate = document.querySelector("#sendTimeContainer input[type='datetime-local']").value;
+
+        if (scheduledDate) {
+            let selectedDateTime = new Date(scheduledDate); // 사용자가 선택한 예약 시간
+            let currentDateTime = new Date(); // 현재 날짜 및 시간
+
+            if (selectedDateTime <= currentDateTime) {
+                alert("예약발송일은 현재일 보다 작거나 같을 수 없습니다.");
+                return;
+            }
+        }
+
+        // 📌 유효성 검사를 통과한 경우 최종 확인
+        if (!confirm("발송 하시겠습니까?")) {
+            return;
+        }
+
+
+        // 📌 유효한 수신자 목록을 input 필드에 저장
         document.getElementById("selectedNumbers").value = selectedNumbers.join(",");
         // selectedNumbers 배열의 값들을 쉼표(,)로 연결하여 문자열로 만든 뒤, id="selectedNumbers" 인 <input> 태그의 값으로 설정
 
-        event.target.submit(); // 수정된 값과 함께 폼 제출
+        event.target.submit(); // 📌수정된 값과 함께 폼 제출
     }
+
+
+
 
     // ✅ 예약 전송 시
     function toggleReserve(show) {
@@ -146,7 +190,7 @@
     function moveCheckedRows() {
         const mainTable = document.getElementById("mainTable");
         const selectedTable = document.getElementById("selectedTable").getElementsByTagName("tbody")[0];
-        console.log(selectedTable);
+        let isEssential = false; // 휴대전화 정보가 없는 사용자가 있는지 확인
 
         document.querySelectorAll("#mainTable .userCheckbox:checked").forEach(checkbox => {
             let row = checkbox.closest("tr");
@@ -154,7 +198,16 @@
             let userIdElement = row.querySelector("td[user-id] span");
             let userId = userIdElement.innerText;
 
-            // 중복 확인 (user-id 속성 기반)
+            // 📌 유효성 검사 : 핸드폰 번호가 있는지 확인
+            let phoneElement = row.querySelector("td[data-phone] span");
+            let phoneNumber = phoneElement ? phoneElement.innerText.trim() : "";
+
+            if (!phoneNumber) {
+                isEssential = true; // 휴대전화 정보 없는 사용자 발견
+                return; // 추가하지 않음
+            }
+
+            // 📌 중복 확인 (user-id 속성 기반)
             if ([...selectedTable.rows].some(r => r.querySelector("td[user-id] span")?.innerText === userId)) {
                 return; // 중복 방지
             }
@@ -169,12 +222,12 @@
                 let newCell = newRow.insertCell();
                 newCell.innerHTML = row.cells[i].innerHTML;
 
-                 // 핸드폰번호 칸인 경우 data-phone 속성 추가
+                 // 📌 핸드폰번호 칸인 경우 data-phone 속성 추가
                 if (row.cells[i].hasAttribute("data-phone")) {
                     newCell.setAttribute("data-phone", "");
                 }
 
-                // 사용자 아이디 칸인 경우 user-id 속성 추가
+                // 📌 사용자 아이디 칸인 경우 user-id 속성 추가
                 if (row.cells[i].hasAttribute("user-id")) {
                     newCell.setAttribute("user-id", "");
                 }
@@ -184,6 +237,11 @@
         document.querySelectorAll("#mainTable .userCheckbox:checked").forEach(checkbox => {
             checkbox.checked = false;
         });
+
+        // 📌 유효성 검사 실패 시 경고 메시지 출력
+        if (isEssential) {
+            alert("휴대전화 정보가 등록되지 않은 고객은 추가되지 않습니다.");
+        }
     }
 
     // ✅ 선택 삭제
