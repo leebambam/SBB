@@ -58,6 +58,10 @@
             <label for="messageContent" class="form-label">내용</label>
             <textarea id="messageContent" th:field="*{messageContent}" class="form-control" rows="10"></textarea>
         </div>
+        <span id="byte">0</span><span> / 90 byte</span>
+
+        <br>
+        <br>
 
         <!-- 체크된 전화번호 -->
         <input type="hidden" name="selectedNumbers" id="selectedNumbers">
@@ -175,6 +179,7 @@
         document.getElementById("selectedNumbers").value = selectedNumbers.join(",");
         // selectedNumbers 배열의 값들을 쉼표(,)로 연결하여 문자열로 만든 뒤, id="selectedNumbers" 인 <input> 태그의 값으로 설정
 
+
         event.target.submit(); // 📌수정된 값과 함께 폼 제출
     }
 
@@ -246,11 +251,48 @@
 
     // ✅ 선택 삭제
     function removeCheckedRows() {
-    document.querySelectorAll("#selectedTable .selectedCheckbox:checked").forEach(checkbox => {
-        checkbox.closest("tr").remove();
-    });
-}
+        document.querySelectorAll("#selectedTable .selectedCheckbox:checked").forEach(checkbox => {
+            checkbox.closest("tr").remove();
+        });
+    }
 
+
+    // ✅ 문자열의 EUC-KR 바이트 길이 계산 함수
+    function getByteLength(str) {
+        let byteLength = 0;
+        for (let i = 0; i < str.length; i++) {
+            let charCode = str.charCodeAt(i);
+            if (charCode < 0x80) {
+                byteLength += 1; // 영문, 숫자, 특수문자 등 1바이트
+            } else {
+                byteLength += 2; // 한글 등 2바이트
+            }
+        }
+        return byteLength;
+    }
+
+    // ✅ 실시간 바이트 수 업데이트
+    function updateByteCount() {
+        let messageContent = document.getElementById("messageContent");
+        let byteSpan = document.getElementById("byte");
+        let maxByte = 90;
+
+        let currentByte = getByteLength(messageContent.value);
+
+        if (currentByte > maxByte) {
+            alert("입력 가능한 최대 바이트(90)를 초과했습니다.");
+            messageContent.value = messageContent.value.slice(0, -1); // 마지막 입력 제거
+            currentByte = getByteLength(messageContent.value); // 다시 계산
+        }
+
+        byteSpan.textContent = currentByte;
+    }
+
+    // ✅ 사용자가 입력할 때마다 updateByteCount라는 함수를 실행
+    document.addEventListener("DOMContentLoaded", function () {
+        let messageContent = document.getElementById("messageContent");
+        messageContent.addEventListener("input", updateByteCount);
+    });
 
 </script>
 </html>
