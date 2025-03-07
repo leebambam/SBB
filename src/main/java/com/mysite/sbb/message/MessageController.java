@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -63,6 +64,46 @@ public class MessageController {
         List<String> phoneNumbers = Arrays.asList(selectedNumbers.split(","));
 
         this.messageService.smsSend(smsDto, userDto, phoneNumbers);
+        return "redirect:/question/list";
+    }
+
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/email")
+    public String email(Model model, EmailForm emailForm){
+
+        List<UserDto> userDto = messageService.getUser();
+
+        model.addAttribute("user", userDto);
+
+        return "email_form";
+    }
+
+
+    @PostMapping("/email")
+    public String email(@Valid EmailForm emailForm, @RequestParam("selectedEmails") String selectedEmails,
+                        BindingResult bindingResult, Principal principal, RedirectAttributes redirectAttributes){
+        if (bindingResult.hasErrors()) {
+            return "email_form";
+        }
+
+        EmailDto emailDto = EmailDto.builder()
+                .sender("nheene30@gemtek.co.kr")
+                .subject(emailForm.getSubject())
+                .content(emailForm.getContent())
+                .send_dt(LocalDateTime.now())
+                .build();
+
+        UserDto userDto = this.userService.getUser(principal.getName());
+
+        // 선택된 번호들을 리스트로 변환
+        List<String> emails = Arrays.asList(selectedEmails.split(","));
+
+        this.messageService.emailSend(emailDto, userDto, emails);
+
+        // 📌 성공 메시지 추가
+        redirectAttributes.addFlashAttribute("emailSuccess", true);
+
         return "redirect:/question/list";
     }
 

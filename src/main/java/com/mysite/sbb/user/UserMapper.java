@@ -5,6 +5,7 @@ import com.mysite.sbb.question.Question;
 import com.mysite.sbb.question.QuestionDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public interface UserMapper {
     UserDto toDto(SiteUser siteUser);
 
     // DTO → 엔티티 변환
+    @Named("toEntity")
     SiteUser toEntity(UserDto userDto);
 
     // Form → DTO 변환

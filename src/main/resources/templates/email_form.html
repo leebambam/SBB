@@ -1,0 +1,217 @@
+<html layout:decorate="~{layout}">
+<div layout:fragment="content" class="container">
+    <h5 class="my-3 border-bottom pb-2 bg-light p-2 rounded">E-Mail 전송</h5>
+    <h6 class="my-3 pb-2 text-secondary">▶ 수신 대상 선택</h6>
+    <table class="table" id="mainTable">
+        <thead class="table">
+        <tr class="text-center">
+            <th>
+                <input type="checkbox" id="selectAll" onclick="toggleAllCheckboxes(this)">
+            </th>
+            <th>번호</th>
+            <th >사용자 아이디</th>
+            <th>핸드폰번호</th>
+            <th>이메일</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="text-center" th:each="user, stat : ${user}">
+            <td>
+                <input type="checkbox" class="userCheckbox">
+            </td>
+            <td th:text="${stat.count}"></td>
+            <td user-id><span th:text="${user.username}"></span></td>
+            <td data-phone><span th:if="${user.phoneNumber != null}" th:text="${user.phoneNumber}"></span></td>
+            <td data-email><span th:if="${user.email != null}" th:text="${user.email}"></span></td>
+        </tr>
+        </tbody>
+    </table>
+    <button onclick="moveCheckedRows()" class="btn btn-primary my-2">선택 추가</button>
+    <br>
+    <br>
+    <h6 class="my-3 pb-2 text-secondary">▶ 수신 대상</h6>
+    <table class="table" id="selectedTable">
+        <thead class="table">
+        <tr class="text-center">
+            <th>
+                <input type="checkbox" id="selectSelectedAll" onclick="toggleAllSelectedCheckboxes(this)">
+            </th>
+            <th>번호</th>
+            <th >사용자 아이디</th>
+            <th>핸드폰번호</th>
+            <th>이메일</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <button onclick="removeCheckedRows()" class="btn btn-primary my-2">선택 삭제</button>
+    <br>
+    <br>
+    <h6 class="my-3 pb-2 text-secondary">▶ 발송 내용</h6>
+    <form th:object="${emailForm}" method="post" onsubmit="addselectedEmails(event)">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+        <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+
+        <div class="mb-3">
+            <label for="subject" class="form-label">제목</label>
+            <input type="text" id="subject" th:field="*{subject}" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">내용</label>
+            <textarea id="content" th:field="*{content}" class="form-control" rows="10"></textarea>
+        </div>
+        <input type="submit" value="전송하기" class="btn btn-primary my-2">
+        <!-- 체크된 전화번호 -->
+        <input type="hidden" name="selectedEmails" id="selectedEmails">
+    </form>
+    <br>
+    <br>
+</div>
+<script layout:fragment="script" type='text/javascript'>
+    // ✅ 수신 대상 전체 선택
+    function toggleAllCheckboxes(source) {
+        let checkboxes = document.querySelectorAll(".userCheckbox");
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = source.checked;
+        });
+    }
+
+    // ✅ 선택된 수신 대상 전체 선택
+    function toggleAllSelectedCheckboxes(source) {
+        let checkboxes = document.querySelectorAll(".selectedCheckbox");
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = source.checked;
+        });
+    }
+
+
+
+    // ✅ 발송 시 선택된 수신 대상 처리
+    function addselectedEmails(event) {
+        event.preventDefault(); // 폼 제출 방지 (체크된 값을 먼저 설정)
+
+        let selectedEmails = [];
+        let checkboxes = document.querySelectorAll(".selectedCheckbox:checked");
+
+        checkboxes.forEach(checkbox => {
+            let emailCell = checkbox.closest("tr").querySelector("td[data-email] span");
+            if (emailCell) {
+                let emails = emailCell.textContent.trim();
+                if (emails) {
+                    selectedEmails.push(emails);
+                }
+            }
+        });
+
+        // 1️⃣ 수신 대상자가 없는 경우
+        if (selectedEmails.length === 0) {
+            alert("발송할 수신대상자가 없습니다.");
+            return;
+        }
+
+        // 2️⃣ 제목이 입력되지 않은 경우
+        let subject = document.getElementById("subject").value.trim();
+        if (!subject) {
+            alert("제목을 입력하여 주세요.");
+            return;
+        }
+
+        // 3️⃣ 발송 내용이 입력되지 않은 경우
+        let content = document.getElementById("content").value.trim();
+        if (!content) {
+            alert("발송내용을 입력하여 주세요.");
+            return;
+        }
+
+        // 📌 유효성 검사를 통과한 경우 최종 확인
+        if (!confirm("발송 하시겠습니까?")) {
+            return;
+        }
+
+
+        // 📌 유효한 수신자 목록을 input 필드에 저장
+        document.getElementById("selectedEmails").value = selectedEmails.join(",");
+        // selectedEmails 배열의 값들을 쉼표(,)로 연결하여 문자열로 만든 뒤, id="selectedEmails" 인 <input> 태그의 값으로 설정
+
+
+        event.target.submit(); // 📌수정된 값과 함께 폼 제출
+    }
+
+
+    // ✅ 선택 추가 기능
+    function moveCheckedRows() {
+        const mainTable = document.getElementById("mainTable");
+        const selectedTable = document.getElementById("selectedTable").getElementsByTagName("tbody")[0];
+        let isEssential = false; // 이메일 정보가 없는 사용자가 있는지 확인
+
+        document.querySelectorAll("#mainTable .userCheckbox:checked").forEach(checkbox => {
+            let row = checkbox.closest("tr");
+
+            let userIdElement = row.querySelector("td[user-id] span");
+            let userId = userIdElement.innerText;
+
+            // 📌 유효성 검사 : 이메일이 있는지 확인
+            let emailElement = row.querySelector("td[data-email] span");
+            let emails = emailElement ? emailElement.innerText.trim() : "";
+
+            if (!emails) {
+                isEssential = true; // 이메일 정보 없는 사용자 발견
+                return; // 추가하지 않음
+            }
+
+            // 📌 중복 확인 (user-id 속성 기반)
+            if ([...selectedTable.rows].some(r => r.querySelector("td[user-id] span")?.innerText === userId)) {
+                return; // 중복 방지
+            }
+
+            let newRow = selectedTable.insertRow();
+            newRow.setAttribute("class", "text-center");
+
+            let newCell = newRow.insertCell();
+            newCell.innerHTML = '<input type="checkbox" class="selectedCheckbox" checked>';
+
+            for (let i = 1; i < row.cells.length; i++) {
+                let newCell = newRow.insertCell();
+                newCell.innerHTML = row.cells[i].innerHTML;
+
+                // 📌 이메일 칸인 경우 data-email 속성 추가
+                if (row.cells[i].hasAttribute("data-email")) {
+                    newCell.setAttribute("data-email", "");
+                }
+
+                // 📌 사용자 아이디 칸인 경우 user-id 속성 추가
+                if (row.cells[i].hasAttribute("user-id")) {
+                    newCell.setAttribute("user-id", "");
+                }
+            }
+        });
+
+        document.querySelectorAll("#mainTable .userCheckbox:checked").forEach(checkbox => {
+            checkbox.checked = false;
+        });
+
+        // 📌 유효성 검사 실패 시 경고 메시지 출력
+        if (isEssential) {
+            alert("휴대전화 정보가 등록되지 않은 고객은 추가되지 않습니다.");
+        }
+    }
+
+    // ✅ 선택 삭제
+    function removeCheckedRows() {
+        document.querySelectorAll("#selectedTable .selectedCheckbox:checked").forEach(checkbox => {
+            checkbox.closest("tr").remove();
+        });
+    }
+
+
+     // ✅ 성공 시 alert 표시
+    window.onload = function() {
+        let emailSuccess = "[[${emailSuccess}]]";
+        if (emailSuccess === 'true') {
+            alert("전송을 성공하였습니다.");
+        }
+    };
+</script>
+</html>

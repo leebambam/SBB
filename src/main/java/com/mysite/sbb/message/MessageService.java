@@ -1,9 +1,6 @@
 package com.mysite.sbb.message;
 
-import com.mysite.sbb.user.SiteUser;
-import com.mysite.sbb.user.UserDto;
-import com.mysite.sbb.user.UserMapper;
-import com.mysite.sbb.user.UserRepository;
+import com.mysite.sbb.user.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -22,6 +19,9 @@ public class MessageService {
     private final UserMapper userMapper;
     private final MsgQueueRepository msgQueueRepository;
     private final MsgQueueMapper msgQueueMapper;
+    private final EmailMapper emailMapper;
+    private final EmailRepository emailRepository;
+    private final EmailService emailService;
 
     public List<UserDto> getUser() {
         List<SiteUser> siteUser = this.userRepository.findAll();
@@ -50,5 +50,33 @@ public class MessageService {
         List<MsgQueue> msgQueue = msgQueueMapper.toEntityList(msgQueueDtoList);
 
         this.msgQueueRepository.saveAll(msgQueue);
+    }
+
+
+    public void emailSend(EmailDto emailDto, UserDto userDto, List<String> emails) {
+
+        String subject = emailDto.getSubject();
+        String text = emailDto.getContent();
+
+        for (String email : emails) {
+            emailService.sendEmail(email, subject, text);
+        }
+
+        // E-Mail 공지 발송 Log 테이블(TBL_MAIL_LOG) 등록하기
+        List<EmailDto> emailDtoList  = emails.stream()
+                .map(emailData -> EmailDto.builder()
+                        .sender(emailDto.getSender())
+                        .recipient(emailData)
+                        .subject(emailDto.getSubject())
+                        .content(emailDto.getContent())
+                        .status("1")
+                        .send_dt(emailDto.getSend_dt())
+                        .reg_id(userDto)
+                        .build())
+                .collect(Collectors.toList());
+
+        List<Email> Email = emailMapper.toEntityList(emailDtoList);
+
+        this.emailRepository.saveAll(Email);
     }
 }
