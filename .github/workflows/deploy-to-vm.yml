@@ -3,15 +3,16 @@ name: Deploy to Test VM (new-branch)
 on:
   push:
     branches:
-      - new-branch   # new-branch에 push될 때 실행
+      - new-branch
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: self-hosted
-    timeout-minutes: 60  # 최대 60분까지 허용
+    timeout-minutes: 60
     steps:
       # 1. 저장소 코드 가져오기
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       # 2. Java 환경 세팅
       - name: Set up JDK 11
@@ -28,20 +29,27 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
-      # 5. JAR 파일을 VM으로 안정적으로 복사 (rsync 사용)
-      - name: Copy build files to VM via rsync
-        run: |
-          rsync -avz -e "ssh -p ${{ secrets.VM_PORT }}" \
-            build/libs/sbb-0.0.1-SNAPSHOT.jar \
-            ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/webmsg/web/testSbb/
-
-      # 6. VM에서 애플리케이션 실행 (ssh 사용)
-      - name: Run application on VM via ssh
-        run: |
-          ssh -p ${{ secrets.VM_PORT }} ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-            cd /home/webmsg/web/testSbb
-            # 이전 실행 중인 프로세스 종료
+      # 5. SSH 키를 사용하여 VM에 접속
+      - name: Deploy application to VM
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          port: ${{ secrets.VM_PORT }}
+          script: |
+            # 1. 이전 애플리케이션 종료
             pkill -f 'java -jar sbb-0.0.1-SNAPSHOT.jar' || true
-            # 새로운 애플리케이션 실행 (백그라운드)
+
+            # 2. 새로운 JAR 파일 복사
+            # 'scp' 명령어에 워크플로우의 'build/libs' 경로가 아닌
+            # VM 내의 'build/libs' 경로를 사용해야 합니다.
+            # 이 워크플로우는 SSH 접속 전에 이미 빌드가 완료되어 있으므로
+            # 파일 복사를 위해 'scp'를 직접 실행하는 대신 'ssh-action'을 사용해 복사합니다.
+            scp -P ${{ secrets.VM_PORT }} \
+              /home/actions-runner/_work/SBB/SBB/build/libs/sbb-0.0.1-SNAPSHOT.jar \
+              ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/webmsg/web/testSbb/sbb-0.0.1-SNAPSHOT.jar
+
+            # 3. 새로운 애플리케이션 백그라운드 실행
+            cd /home/webmsg/web/testSbb
             nohup java -jar sbb-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
-          EOF
