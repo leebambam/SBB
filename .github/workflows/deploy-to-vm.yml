@@ -3,7 +3,7 @@ name: Deploy to Test VM
 on:
   push:
     branches:
-      - main   # main 브랜치에 push될 때 실행
+      - main
 
 jobs:
   build:
@@ -19,36 +19,26 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      # 2-1. gradlew 실행 권한 부여
+      # 3. gradlew 실행 권한 부여
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      # 3. Gradle 빌드
+      # 4. Gradle 빌드
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
-      # 4. VM에 업로드
-      - name: Copy build files to VM
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          password: ${{ secrets.VM_PASSWORD }}
-          port: ${{ secrets.VM_PORT }}
-          source: "build/libs/*.jar"
-          target: "/home/webmsg/web/testSbb/"
+      # 5. JAR 파일을 VM으로 복사 (scp 사용)
+      - name: Copy build files to VM via scp
+        run: |
+          scp -P ${{ secrets.VM_PORT }} \
+            build/libs/*.jar \
+            ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/webmsg/web/testSbb/
 
-      # 5. VM에서 애플리케이션 실행
-      - name: Run application on VM
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          password: ${{ secrets.VM_PASSWORD }}
-          port: ${{ secrets.VM_PORT }}
-          script: |
+      # 6. VM에서 애플리케이션 실행 (ssh 사용)
+      - name: Run application on VM via ssh
+        run: |
+          ssh -p ${{ secrets.VM_PORT }} ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
             cd /home/webmsg/web/testSbb
-            # 이전 실행 중인 프로세스 종료
             pkill -f 'java -jar sbb-0.0.1-SNAPSHOT.jar' || true
-            # 새로운 애플리케이션 실행 (백그라운드)
             nohup java -jar sbb-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+          EOF
