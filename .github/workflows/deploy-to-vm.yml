@@ -1,0 +1,38 @@
+name: Deploy to Test VM (new-branch)
+
+on:
+  push:
+    branches:
+      - new-branch   # 이 브랜치에 push될 때만 실행
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
+
+      - name: Copy build files to VM via scp
+        run: |
+          scp -P ${{ secrets.VM_PORT }} \
+            build/libs/*.jar \
+            ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/webmsg/web/testSbb/
+
+      - name: Run application on VM via ssh
+        run: |
+          ssh -p ${{ secrets.VM_PORT }} ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+            cd /home/webmsg/web/testSbb
+            pkill -f 'java -jar sbb-0.0.1-SNAPSHOT.jar' || true
+            nohup java -jar sbb-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+          EOF
