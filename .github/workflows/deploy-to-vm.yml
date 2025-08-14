@@ -6,8 +6,12 @@ on:
       - main   # main 브랜치에 push될 때 실행
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run build
+        run: echo "Running on self-hosted runner"
 
     steps:
     # 1. 저장소 코드 가져오기
